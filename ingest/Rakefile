@@ -3,7 +3,7 @@ require 'net/http'
 
 desc 'Creates a new CouchDB Docker container and creates default databases.'
 task :dbinit do
-    sh 'sudo docker run -p 5984:5984 -d --name cs588couchdb couchdb:2.3.1'
+    sh 'sudo docker run -p 5984:5984 -d --name chartsoup-couchdb couchdb:2.3.1'
     puts "Sleeping to let CouchDB spin up..."
     sleep(10)
     sh 'curl -X PUT http://localhost:5984/_global_changes'
@@ -13,7 +13,7 @@ end
 
 desc 'Starts the CouchDB Docker container.'
 task :start do
-    sh 'sudo docker start cs588couchdb'
+    sh 'sudo docker start chartsoup-couchdb'
 end
 
 desc 'Deletes and regenerates the "bounty" database.'
@@ -36,11 +36,11 @@ end
 
 desc 'Stops the CouchDB Docker container.'
 task :stop do
-    sh 'sudo docker stop cs588couchdb'
+    sh 'sudo docker stop chartsoup-couchdb'
 end
 
 desc 'Stops and removes the CouchDB Docker container.'
 task :clean do
     Rake::Task["stop"].invoke
-    sh 'sudo docker rm cs588couchdb'
+    sh 'sudo docker rm chartsoup-couchdb'
 end
