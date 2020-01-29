@@ -1,8 +1,8 @@
 # Soup Kitchen Website Dashboard
 
-Team Chart Soup: Dylan Laufenberg
-CS 510 - Analytics in Data Science
-Portland State University
+Team Chart Soup: Dylan Laufenberg \
+CS 510 - Analytics in Data Science \
+Portland State University \
 Winter 2020
 
 ## Project Goal
