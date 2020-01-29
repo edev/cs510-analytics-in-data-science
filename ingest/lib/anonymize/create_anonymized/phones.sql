@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS anonymized_phones (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    phone   VARCHAR(255)
+);
+

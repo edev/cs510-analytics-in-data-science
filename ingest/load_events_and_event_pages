@@ -1,0 +1,123 @@
+#!/usr/bin/env ruby
+
+##
+# This script loads the events and event pages from the SQLite3 database into CouchDB. It expects the name of the
+# anonymized database file as a command-line argument. Any messages or errors are printed to stdout/stderr.
+#
+# Invocation:
+#
+#   ./load_events_and_event_pages mydb.sqlite3
+
+require 'sqlite3'
+require_relative 'lib/couchdb'
+
+# IDs
+# Note: determining these with slightly more advanced SQL would give me no advantage,
+# since I would still need to manually annotate correct dates for each event. And even
+# more complicated logic to infer all of the above would just be a waste of time here.
+YEARS = {
+    2 => 2013, # Event ID: Year
+    3 => 2013,
+    6 => 2014,
+    7 => 2014,
+    8 => 2015,
+    9 => 2015,
+    10 => 2016,
+    11 => 2016,
+    12 => 2017,
+    13 => 2017,
+    14 => 2018,
+    15 => 2018,
+    16 => 2019,
+    17 => 2019
+}
+
+# Manually annotated correct dates for each event.
+DATES = {
+    2013 => {
+        dinner: 'December 17, 2013',
+        wrapping_party: 'December 14, 2013'
+    },
+    2014 => {
+        dinner: 'December 23, 2014',
+        wrapping_party: 'December 20, 2014'
+    },
+    2015 => {
+        dinner: 'December 22, 2015',
+        wrapping_party: 'December 19, 2015'
+    },
+
+    2016 => {
+        dinner: 'December 20, 2016',
+        wrapping_party: 'December 17, 2016'
+    },
+
+    2017 => {
+        dinner: 'December 19, 2017',
+        wrapping_party: 'December 16, 2017'
+    },
+
+    2018 => {
+        dinner: 'December 18, 2018',
+        wrapping_party: 'December 15, 2018'
+    },
+
+    2019 => {
+        dinner: 'December 17, 2019',
+        wrapping_party: 'December 14, 2019'
+    },
+}
+
+# Check command-line arguments.
+if ARGV.length != 1
+    puts "Missing command-line argument: source sqlite3 file."
+    exit(1)
+end
+
+db = SQLite3::Database.new ARGV[0]
+
+sql_events = db.execute("SELECT * FROM events WHERE name LIKE '%201%'")
+sql_events.each do |event|
+    # event is an array with the following items at the given indexes:
+    # 0: SQL record ID
+    # 1: name
+    # 2. description
+    # 3. created_at
+    # 4. updated_at
+
+    sql_id, name, description, created_at, updated_at = event
+
+    # Pull year from event ID.
+    year = YEARS[sql_id]
+
+    # Only do this once per pair of SQL event records.
+    if name =~ /volunteer/i
+        # Create the event document.
+        doc = {
+            _id: "christmas/#{year}",
+            dates: DATES[year]
+            # No landing pages are active in the pulled databases, so none of these events will have a landing_page field.
+        }
+        print "Posting #{doc[:_id]}: "
+        CouchDB::post_document(doc)
+    end
+
+    # Construct two page documents and add them to the array.
+    page_type = 
+        if name =~ /volunteer/i
+            'volunteer'
+        else
+            'donate'
+        end
+
+    doc = {
+        _id: "christmas/#{year}/#{page_type}",
+        uri: "christmas/#{year}/#{page_type}",
+        title: name,
+        content: description
+    }
+    print "Posting #{doc[:_id]}: "
+    CouchDB::post_document(doc)
+end
+
+

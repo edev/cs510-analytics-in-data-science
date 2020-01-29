@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS anonymized_emails (
+    id      INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    email   VARCHAR(255)
+);
+

@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+##
+# This script loads the design document that specifies needed views into CouchDB. It takes no arguments.
+# Any messages or errors are printed to stdout/stderr.
+
+require 'json'
+require_relative 'lib/couchdb'
+
+DDOC_FILENAME = 'design_document.rb'
+
+hash = eval(IO.read(DDOC_FILENAME))
+CouchDB::post_document(hash)

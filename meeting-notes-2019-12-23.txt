@@ -1,0 +1,15 @@
+Give Fearless Leader PAPER copies of:
+    - Meals served by day of months
+    - Meals served over time
+    - Screenshot of admin dashboard showing recent meals
+
+Emphasize that these are rough drafts please!
+
+Graphs to develop for website:
+    - A graph of every meal served in the last year (x: date, y: meals)
+    - A graph of every meal served ever (x: date, y: meals)
+    - A scatter plot of all meals served in the last 3 years, organized by which week of which month they're in. So each month will have 5 (or 4-5) columns for the 1st through 5th week of the month, and data points from the last 3 years will be plotted in the appropriate columns. Color the points by which year they're in. Ability to turn on previous years, if it's easy.
+    - A table with these columns: need name, number of sign-ups so far, number of sign-ups by the same number of days before the event last year, goal. Sort the table by percentage progress toward goal this year.
+      - If you click on a need, you get a timeline of sign-ups over all the years (maybe with just the last 3 years on by default but the rest toggle-able if desired). See needs_over_time_per_year_proof_of_concept
+
+This year, we had 120 people show up as present wrappers.

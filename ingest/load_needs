@@ -1,0 +1,143 @@
+#!/usr/bin/env ruby
+
+##
+# This script loads the needs from the SQLite3 database into CouchDB. It expects the name of the
+# anonymized database file as a command-line argument. Any messages or errors are printed to stdout/stderr.
+#
+# Invocation:
+#
+#   ./load_events_and_event_pages mydb.sqlite3
+
+require 'sqlite3'
+require_relative 'lib/couchdb'
+require_relative 'lib/runsql'
+
+SELECT_NEEDS = File.join %w(lib load_needs select_needs.sql)
+
+# The database may include the following needs that are not associated with Christmas.
+# (They're either short-term volunteer requests or test/demo values.)
+EXCLUDED_NEED_NAMES = [
+    "Coffee Stomper Stompers",
+    "Coffee Stompers",
+    "Troll Wranglers",
+    "Weekly towel washers"
+]
+
+##
+# Transforms a name into a slug, including doing quite a bit of clean-up, since we want to preserve
+# the unique history of names but establish correct correct relationships.
+def build_slug(name)
+    slug = name.dup
+
+    # Manual removals, where part of a name just doesn't belong in a slug,
+    # and substitutions, where there's a typo or other name change between years.
+    # Best to do these before any transformations, so it's easy to match them to source inputs.
+    slug.gsub!(/\(including bilingual line monitors\)/, '')
+    slug.gsub! "Distributors", "Adult-child distribution teams"
+    slug.gsub! "Hand Stamper  (We need 2)", "Hand Stampers"
+    slug.gsub! "Photgrapher", "Photographer"
+    slug.gsub! "Sign Maker  (We could use 3 in this category)", "Sign Makers"
+
+    # Strip out first-year "(We need ...)"
+    slug.gsub! /\s*\(+[wo].*$/i, ""
+
+    # General clean-up.
+    slug.downcase!
+    slug.strip!
+
+    # Remove "on DATE...".
+    slug.gsub!(/ on .+$/, '')
+
+    # Convert spaces and hyphens to underscores.
+    slug.gsub!(/(\s|-)+/, '_')
+
+    # Remove any characters other than letters, numbers, and underscores.
+    # (Not sure why we would need numbers, but they're legal, so let's leave them in.)
+    slug.gsub!(/[^\w\d_]/, '')
+
+    slug
+end
+
+def sign_ups(need_id)
+    query = <<~ENDQUERY
+        SELECT name, email, phone, quantity, comment, created_at
+        FROM donors
+        WHERE need_id = #{need_id}
+    ENDQUERY
+
+    sign_ups = $db.execute(query).map do |row|
+        {
+            name: row[0],
+            email: row[1],
+            phone: row[2],
+            quantity: row[3],
+            comment: row[4],
+            created_at: row[5]
+        }
+    end
+
+    subtotal = sign_ups.reduce(0) {|subtotal, sign_up| subtotal += sign_up[:quantity]}
+    
+    return sign_ups, subtotal
+end
+
+# Check command-line arguments.
+if ARGV.length != 1
+    puts "Missing command-line argument: source sqlite3 file."
+    exit(1)
+end
+
+$db = SQLite3::Database.new ARGV[0]
+
+docs = []
+sql_needs = runsql($db,
+                   SELECT_NEEDS)
+
+sql_needs.each do |sql_need|
+    next if EXCLUDED_NEED_NAMES.include? sql_need[1]
+
+    # Start by pulling out the array components so we don't have to deal with brittle indexes elsewhere.
+    sql_id = sql_need[0]
+    name = sql_need[1]
+    description = sql_need[2]
+    goal = sql_need[3]
+    untracked_donations = sql_need[4]
+    created_at = sql_need[5]
+    updated_at = sql_need[6]
+
+    slug = build_slug(name)
+    year = Date.parse(created_at).year
+
+    # The highest volunteer goal is ~80, and the lowest donation need is >100, so we can easily use goal
+    # to infer which type of need we're processing.
+    page = if goal <= 100 then 'volunteer' else 'donate' end
+
+    adjustments = 
+        if untracked_donations == 0
+            nil
+        else
+            {
+                adjustment: untracked_donations,
+                created_at: updated_at
+            }
+        end
+
+    sign_ups, total_sign_ups = sign_ups(sql_id)
+    gathered = total_sign_ups + untracked_donations
+
+    # Now build the final document.
+    doc = {
+        _id: "needs/#{slug}/#{year}",
+        title: name,
+        description: description,
+        page: page,
+        goal: goal,
+        gathered: gathered,
+        adjustments: adjustments,
+        sign_ups: sign_ups
+    }
+    print "Posting #{doc[:_id]}: "
+    CouchDB::post_document(doc)
+end
+
+puts docs

@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require_relative '../../sh'
+
+SOURCE_FILENAME = 'disney-names.txt'
+TABLE_NAME = 'anonymized_emails'
+
+puts "insert into #{TABLE_NAME} (email) values"
+filename = File.join(__dir__, SOURCE_FILENAME)
+cmd = %(shuf \"#{filename}\")
+$id = 1
+sh(cmd).each_line do |value|
+    value.chomp!
+    if $id > 1
+        puts ","
+    end
+
+    email = value.gsub(/[^\w\d]/, '') + "@fakemail.com"
+    print "('#{email}')"
+
+    $id += 1
+end
+puts ";"
+

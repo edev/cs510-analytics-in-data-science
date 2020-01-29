@@ -1,0 +1,112 @@
+#!/usr/bin/env ruby
+
+##
+# This script anonymizes a Bounty Sqlite3 interface. It expects the name of the database file as a command-line
+# argument, and it creates (or overwrites) a file named anonymized.sqlite3 with the result. Any messages or errors
+# are printed to stdout/stderr.
+#
+# Invocation:
+#
+#   ./anonymize mydb.sqlite3
+
+require 'fileutils'
+require 'sqlite3'
+require_relative 'lib/runsql'
+require_relative 'lib/sh'
+
+# The name of the SQLite3 file to be created as part of the script.
+# Any existing file by the same name will be overwritten.
+ANON_DB = 'anonymized.sqlite3'
+
+# In-order list of fields to anonymize through a parallel workflow.
+# Any symbol inserted here must have correctly scaffolded resources on-disk for the script to work.
+ANON_FIELDS = [
+    :names,
+    :emails,
+    :phones
+]
+
+# Directories, filenames, and other constants expected by subsequent steps of the script,
+# listed in the order in which they are used.
+INSERT_ANONYMOUS_DIR = File.join %w(lib anonymize insert_anonymous)
+INSERT_ANONYMOUS_CMD = 'mkinsert'
+CREATE_ANONYMIZED_DIR = File.join %w(lib anonymize create_anonymized)
+CREATE_CONVERSION_DIR = File.join %w(lib anonymize create_conversion)
+LOAD_DONORS_INTO_CONVERSION_DIR = File.join %w(lib anonymize load_donors_into_conversion)
+LOAD_ANONYMOUS_INTO_CONVERSION_DIR = File.join %w(lib anonymize load_anonymous_into_conversion)
+ADD_COLUMN_DIR = File.join %w(lib anonymize add_column_to_donors)
+POPULATE_ANONYMIZED_COLUMN = File.join %w(lib anonymize populate_anonymized_column)
+REPLACE_COLUMNS_DIR = File.join %w(lib anonymize replace_columns)
+REPLACE_COLUMNS_FILES = %w(
+    create_table.sql
+    copy_table.sql
+    drop_original.sql
+    rename_table.sql
+)
+
+# First, do any preparation tasks that only happen once, rather than once per ANON_FIELD entry.
+
+# Check command-line arguments.
+if ARGV.length != 1
+    puts "Missing command-line argument: source sqlite3 file."
+    exit(1)
+end
+
+puts "Copying input database to #{ANON_DB}"
+FileUtils.cp ARGV[0], ANON_DB
+
+puts "Opening #{ANON_DB} as a SQLite3 database"
+db = SQLite3::Database.new ANON_DB
+
+# Now the main workflow, everything that happens once per ANON_FIELD entry.
+ANON_FIELDS.each do |key|
+    # Print section header for this key, e.g. "Names:"
+    puts "#{key.to_s.capitalize}:"
+
+    runsql(db,
+           File.join(CREATE_ANONYMIZED_DIR, "#{key.to_s}.sql"),
+           "Create anonymous value table:",
+           1)
+
+    puts "\tInsert anonymous source data:"
+    filename = File.join(INSERT_ANONYMOUS_DIR, "#{INSERT_ANONYMOUS_CMD}.#{key}")
+    puts "\t\tGenerate SQL (#{filename})"
+    insert_anonymous = sh filename
+    puts "\t\tExecute SQL"
+    db.execute insert_anonymous
+
+    runsql(db,
+           File.join(CREATE_CONVERSION_DIR, "#{key.to_s}.sql"),
+           "Create conversion table:",
+           1)
+
+    runsql(db,
+           File.join(LOAD_DONORS_INTO_CONVERSION_DIR, "#{key.to_s}.sql"),
+           "Load donor values into conversion table:",
+           1)
+
+    runsql(db,
+           File.join(LOAD_ANONYMOUS_INTO_CONVERSION_DIR, "#{key.to_s}.sql"),
+           "Load anonymous values into conversion table:",
+           1)
+
+    runsql(db,
+           File.join(ADD_COLUMN_DIR, "#{key.to_s}.sql"),
+           "Add anonymous column to donors table",
+           1)
+
+    runsql(db,
+           File.join(POPULATE_ANONYMIZED_COLUMN, "#{key.to_s}.sql"),
+           "Populate anonymized column:",
+           1)
+end
+
+puts "Replace original columns:"
+REPLACE_COLUMNS_FILES.each do |file|
+    log_entry = file.gsub(/_/, ' ').gsub('.sql', '').capitalize + ":"
+    runsql(db,
+           File.join(REPLACE_COLUMNS_DIR, file),
+           log_entry,
+           1)
+end
+
