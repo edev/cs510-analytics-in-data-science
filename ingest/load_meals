@@ -1,0 +1,156 @@
+#!/usr/bin/env ruby
+
+##
+# This script loads the meals from the SQLite3 database into CouchDB. It expects the name of the
+# anonymized database file as a command-line argument. Any messages or errors are printed to stdout/stderr.
+#
+# Invocation:
+#
+#   ./load_meals mydb.sqlite3
+
+require 'date'
+require 'sqlite3'
+require_relative 'lib/couchdb'
+
+# Check command-line arguments.
+if ARGV.length != 1
+    puts "Missing command-line argument: source sqlite3 file."
+    exit(1)
+end
+
+db = SQLite3::Database.new ARGV[0]
+
+##
+# The website's DB has created_at and updated_at timestamps recorded in server time (which definitely isn't
+# Bounty's local time) based on when the data were entered; when these dates were recorded, the notion that
+# we might care about analyzing the data was only the slightest whim and was not given serious design
+# consideration. Thus, times are included even though they're superfluous, and dates might be off.
+#
+# To correct for this, we will guess (with high confidence) that the created_at timestamp corresponds to the
+# previous Tuesday. To do this, we'll simply provide a lookup table that converts Date#wday weekday numbers
+# (Sunday=0, ..., Saturday=6) to integer day offsets to the corresponding Tuesday.
+#
+# Finally, we'll check whether there are any duplicates with this guessing scheme, as a sanity check. If so,
+# we'll check whether it appears to be a double entry by the user, e.g. by a double-click or some other accidental
+# double-entry. If so, we'll ignore the meal. Otherwise, we'll try to put the first entry in the previous
+# week's slot, since the weekly updater has sometimes missed a week and then created two entries on the same day.
+# If the previous week's entry is also full, that's a fatal error.
+#
+# Note: I'm aware of the following potential causes of double entries:
+#   1. Double-click.
+#   2. The user entered a typo the first time and tried to correct it.
+#   3. Absolutely no idea.
+
+TUESDAY_OFFSET = [
+    -5, # Sunday
+    -6, # Monday
+     0, # Tuesday
+    -1, # Wednesday
+    -2, # Thursday
+    -3, # Friday
+    -4, # Saturday
+]
+
+meals = Hash.new
+
+##
+# A record of a meal, for use in parsing SQLite3 entries. 
+class MealRecord
+    attr_accessor :name, :number_served, :raw_date
+
+    def initialize(name, number_served, raw_date)
+        @name = name
+        @number_served = number_served
+        @raw_date = raw_date
+    end
+
+    def to_s()
+        @number_served.to_s
+    end
+end
+
+sql_meals = db.execute("SELECT * FROM meals ORDER BY id ASC;")
+sql_meals.each do |meal|
+    # meal is an array with the following items at the given indexes:
+    # 0: SQL record ID
+    # 1: name
+    # 2: number_served
+    # 3: created_at
+    # 4: updated_at
+    
+    name = meal[1]
+    raw_date = DateTime.parse(meal[3])
+
+    # Correct to the previous Tuesday (if necessary).
+    date = raw_date.to_date
+    date += TUESDAY_OFFSET[date.wday]
+    
+    # Double-check that it is, in fact, a Tuesday.
+    unless date.tuesday?
+        $stderr.puts "Error: converted #{meal[3]} to #{date.inspect}, which is not a Tuesday!"
+        exit(1)
+    end
+
+    # Attempt to parse number_served.
+    begin
+        number_served = Integer(meal[2])
+    rescue ArgumentError => e
+        $sterr.puts "Error: could not parse #{meal[2]} as an integer!"
+        exit(1)
+    end
+
+    # Construct the new meal record.
+    new_record = MealRecord.new(name, number_served, raw_date)
+
+    # Check whether there's already an entry for this date.
+    if meals.has_key? date
+        $stderr.puts "Warning: duplicate date (#{date}) found with values #{meals[date]} and #{number_served}!"
+
+        previous_tuesday = date - 7
+
+        # First, check if it's a double-click or other double entry. (Note that not all double-entries are simple
+        # double-clicks; at least one pair of clearly duplicated entries are 2 minutes apart, almost to the second!)
+        # If both number_served values are identical and the times are less than 5 minutes apart, we can safely
+        # assume it's a double entry, especially since we don't generally serve the same meal two weeks in a row.
+        if meals[date].number_served == number_served
+            $stderr.puts "  Info: Numbers served match."
+            if (meals[date].raw_date - raw_date).abs < Rational(5, 60*24) # 5 minutes.
+                $stderr.puts "  Info: Timestamps are within 5 minutes of each other."
+
+                # Yep, double-click. Ignore it.
+                
+                # Just FYI.
+                names_match = meals[date].name == name
+                $stderr.puts "  Info: Names #{"don't " unless names_match}match."
+
+                $stderr.puts "  OK: replace the old entry."
+            end
+
+        # It's not verifiably a duplicate entry. See if it's safe to move the existing intry into the previous week.
+        elsif meals.has_key? previous_tuesday
+            $stderr.puts "  Error: previous Tuesday already has an entry!"
+            exit(1)
+        else
+            # It's not a duplicate entry, and the previous week's entry is empty, so it's very likely that the first
+            # entry assigned to this Tuesday was actually meant for last Tuesday and was just entered very, very late.
+            $stderr.puts "  OK: assigning existing value to previous Tuesday."
+            meals[previous_tuesday] = meals[date]
+        end
+    end
+
+    # Make a record of the current meal.
+    meals[date] = new_record
+end
+
+##
+# Now that all the meals are successfully parsed, we simply need to create CouchDB documents for them.
+
+meals.each do |date, meal_record|
+    doc = {
+        _id: "meals/#{date}",
+        name: meal_record.name,
+        number_served: meal_record.number_served
+    }
+    $stdout.print "Posting #{doc[:_id]}: "
+    CouchDB::post_document(doc)
+end

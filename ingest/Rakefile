@@ -22,6 +22,7 @@ task :load_docs do
     sh 'curl -X PUT http://localhost:5984/bounty'
     ruby './load_events_and_event_pages anonymized.sqlite3'
     ruby './load_needs anonymized.sqlite3'
+    ruby './load_meals anonymized.sqlite3'
 end
 
 desc 'Deletes and regenerates the termproject design document.'
