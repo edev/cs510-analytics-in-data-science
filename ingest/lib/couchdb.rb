@@ -22,6 +22,20 @@ module CouchDB
     def self.post_document(obj)
         doc = JSON.generate(obj)
         uri = uri(DB)
-        puts Net::HTTP.post(uri, doc, JSON_HEADER)
+        $stdout.puts Net::HTTP.post(uri, doc, JSON_HEADER)
+    end
+
+    ##
+    # Converts a Ruby object (typically a Hash) to JSON, then uploads it to the database as a design document.
+    def self.put_ddoc(name, obj)
+        doc = JSON.generate(obj)
+        uri = uri("#{DB}/_design/#{name}")
+        p uri
+        request = Net::HTTP::Put.new(uri)
+
+        Net::HTTP.start(uri.hostname, uri.port) do |http|
+            $stdout.puts http.request(request, doc)
+        end
+
     end
 end

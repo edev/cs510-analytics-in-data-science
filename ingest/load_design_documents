@@ -1,0 +1,98 @@
+#!/usr/bin/env ruby
+
+##
+# This script compiles and loads CouchDB design documents from the specified folder.
+#
+# Each subfolder in the specified folder compiles into a design document by the same name. Within these subfolders,
+# each subsequent level of folder compiles into a nested JSON object. The name of each subfolder compiles into the
+# object's key/name. Any files compile into strings.
+#
+# The intended use case for this application is to separate the complex JSON design document format into a folder
+# structure for organization and one .js file per function.
+#
+# Example:
+#
+#   ./design_documents/foo/views/bar/map.js
+#   ./design_documents/foo/views/bar/reduce.js
+#   ./design_documents/foo/shows/baz.js
+#
+#   Compiles into:
+#
+#   {
+#       '_id': '_design/foo',
+#       'views': {
+#           'bar': {
+#               'map': 'contents of map.js',
+#               'reduce': 'contents of reduce.js'
+#           }
+#       },
+#       'shows': {
+#           'baz': 'contents of baz.js'
+#       }
+#   }
+#
+# Invocation:
+#
+#   ./load_design_documents design_doc_folder
+
+require_relative 'lib/couchdb'
+
+##
+# Recursively processes the current directory, nesting Hash objects for each directory and reading each file
+# as a string value. Returns the resulting Hash.
+def dir_to_hash()
+    hash = Hash.new
+    Dir.children(File.join('.')).each do |item|
+        if File.directory? item
+            # Recurse on this subdirectory.
+            Dir.chdir(item) do |subdir|
+                hash[item] = dir_to_hash
+            end
+        else
+            # Read this file into a string and save it to the Hash.
+            key = item.gsub(/(\.[^.]+)+$/, '')
+            hash[key] = IO.read(item)
+        end
+    end
+    hash
+rescue SystemCallError => e
+    $stderr.puts "Fatal: dir_to_hash recursed into " + File.join(dir_path) + ", which is not a directory."
+    exit(1)
+end
+
+# Check command-line arguments.
+if ARGV.length != 1
+    $stderr.puts "Missing command-line argument: design documents folder."
+    exit(1)
+end
+
+ddoc_dir = ARGV[0]
+
+begin
+    Dir.children(ddoc_dir).each do |ddoc_name|
+        # As we traverse directories, we'll track them with dir_path.
+        dir_path = [ddoc_dir, ddoc_name]
+
+        unless File.directory? File.join(dir_path)
+            $stderr.puts "Warning: " + File.join(dir_path) + " is not a directory. Skipping."
+            next
+        end
+
+        # ddoc_name will become the name of a design document, once we compile its contents (if any).
+        # We'll collect the document itself as ddoc. Note that we'll use PUT /{db}/_design/{doc} from the
+        # CouchDB API, so we won't fill in the _id key.
+        ddoc = Hash.new
+
+        Dir.chdir(File.join(ddoc_dir, ddoc_name)) do |path|
+            ddoc[ddoc_name] = dir_to_hash
+        end
+
+        begin
+            CouchDB::put_ddoc(ddoc_name, ddoc)
+        rescue SystemCallError => e
+            $stderr.puts e
+        end
+    end
+rescue SystemCallError => e
+    $stderr.puts ddoc_dir + " is not a directory."
+end

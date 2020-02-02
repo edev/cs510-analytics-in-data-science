@@ -12,7 +12,16 @@
 #
 # and, you'll have to watch "config/Guardfile" instead of "Guardfile"
 
-guard 'rake', :task => 'build_views' do
-  watch 'load_views'
-  watch 'design_document.rb'
+guard 'rake', :task => 'full_rebuild', :run_on_start => false, :run_on_all => true do
+  watch 'anonymize'
+  watch 'anonymized.sqlite3'
+  watch 'events_and_event_pages'
+  watch 'load_meals'
+  watch 'load_needs'
 end
+
+guard 'rake', :task => 'reload_ddocs', :run_on_start => false, :run_on_all => false do
+    watch 'load_design_documents'
+    watch %r{^design_documents/.+}
+end
+

@@ -16,23 +16,33 @@ task :start do
     sh 'sudo docker start chartsoup-couchdb'
 end
 
-desc 'Deletes and regenerates the "bounty" database.'
-task :load_docs do
+desc 'Fully rebuilds the "bounty" database.'
+task :full_rebuild do
     sh 'curl -X DELETE http://localhost:5984/bounty'
     sh 'curl -X PUT http://localhost:5984/bounty'
     ruby './load_events_and_event_pages anonymized.sqlite3'
     ruby './load_needs anonymized.sqlite3'
     ruby './load_meals anonymized.sqlite3'
+    Rake::Task["reload_ddocs"].invoke
 end
 
-desc 'Deletes and regenerates the termproject design document.'
-task :build_views do
+desc 'Reloads the "bounty" database\'s design documents.'
+task :reload_ddocs do
     # Delete existing document: get revision then delete.
-    existing = JSON.parse(`curl http://localhost:5984/bounty/_design/termproject`)
-    sh "curl -X DELETE http://localhost:5984/bounty/_design/termproject?rev=#{existing["_rev"]}"
+    # existing = JSON.parse(`curl http://localhost:5984/bounty/_design/termproject`)
+    # sh "curl -X DELETE http://localhost:5984/bounty/_design/termproject?rev=#{existing["_rev"]}"
+    result = JSON.parse(
+        Net::HTTP.get(
+            URI("http://localhost:5984/bounty/_all_docs?startkey=%22_design/%22&endkey=%22_design0%22")),
+        symbolize_names: true
+    )
+    result[:rows].each do |ddoc|
+        # Delete each design document.
+        sh "curl -X DELETE http://localhost:5984/bounty/#{ddoc[:id]}?rev=#{ddoc[:value][:rev]}" # Will probably fail w/o revision info.
+    end
 
     # Load updated document.
-    ruby './load_views'
+    ruby './load_design_documents design_documents'
 end
 
 desc 'Stops the CouchDB Docker container.'
