@@ -14,7 +14,6 @@
 
 guard 'rake', :task => 'full_rebuild', :run_on_start => false, :run_on_all => true do
   watch 'anonymize'
-  watch 'anonymized.sqlite3'
   watch 'events_and_event_pages'
   watch 'load_meals'
   watch 'load_needs'
