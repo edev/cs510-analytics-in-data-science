@@ -1,0 +1,11 @@
+body {
+    font-family: sans-serif;
+}
+
+ul {
+    list-style-type: none;
+}
+
+li {
+    margin-bottom: 1.5em;
+}
