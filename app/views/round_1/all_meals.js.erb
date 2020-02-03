@@ -2,11 +2,12 @@ document.addEventListener('DOMContentLoaded', function () {
   var chart = Highcharts.chart({
     chart: {
       renderTo: 'all_meals',
-      type: 'line'
+      type: 'line',
+      zoomType: 'x'
     },
     plotOptions: {
       series: {
-        findNearestPointBy: "xy",
+        findNearestPointBy: 'xy',
         marker: {
           enabled: true
         }
@@ -22,8 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
       text: 'All recorded meals'
     },
     xAxis: {
-      title: {
-        text: 'Meal date'
+      dateTimeLabelFormats: {
+        day: '%e. %b',
+        week: '%B %e',
+        month: '%B %Y',
+        year: '%Y'
       },
       type: 'datetime',
     },
