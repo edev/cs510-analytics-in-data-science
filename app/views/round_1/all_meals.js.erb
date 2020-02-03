@@ -4,6 +4,13 @@ document.addEventListener('DOMContentLoaded', function () {
       renderTo: 'all_meals',
       type: 'line'
     },
+    plotOptions: {
+      series: {
+        marker: {
+          enabled: true
+        }
+      }
+    },
     series: [{
       name: 'Meals served',
       data: [
