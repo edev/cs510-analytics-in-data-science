@@ -1,0 +1,28 @@
+document.addEventListener('DOMContentLoaded', function () {
+  var chart = Highcharts.chart({
+    chart: {
+      renderTo: 'all_meals',
+      type: 'line'
+    },
+    title: {
+      text: 'All recorded meals'
+    },
+    series: [{
+      name: 'Meals served',
+      data: [
+<%= @data %>
+      ]
+    }],
+    xAxis: {
+      title: {
+        text: 'Meal date'
+      },
+      type: 'datetime',
+    },
+    yAxis: {
+      title: {
+        text: 'Number of plates served'
+      }
+    }
+  });
+});
