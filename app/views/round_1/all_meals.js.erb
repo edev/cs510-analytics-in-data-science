@@ -4,15 +4,15 @@ document.addEventListener('DOMContentLoaded', function () {
       renderTo: 'all_meals',
       type: 'line'
     },
-    title: {
-      text: 'All recorded meals'
-    },
     series: [{
       name: 'Meals served',
       data: [
 <%= @data %>
       ]
     }],
+    title: {
+      text: 'All recorded meals'
+    },
     xAxis: {
       title: {
         text: 'Meal date'
