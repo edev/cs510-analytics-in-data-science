@@ -38,7 +38,7 @@ module CouchDB
   ##
   # Sends a Get request to CouchDB for the given URI, parses the JSON response as a Hash, and returns it.
   def self.get(uri)
-    JSON.parse(Net::HTTP.get(uri))
+    JSON.parse(Net::HTTP.get(uri), symbolize_names: true)
   end
 
   ##
