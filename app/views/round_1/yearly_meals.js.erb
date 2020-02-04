@@ -1,0 +1,48 @@
+document.addEventListener('DOMContentLoaded', function () {
+  var chart = Highcharts.chart({
+    chart: {
+      renderTo: 'yearly_meals',
+      type: 'line'
+    },
+    plotOptions: {
+      series: {
+        findNearestPointBy: 'xy',
+        marker: {
+          enabled: true
+        }
+      }
+    },
+    series: [
+<% @years.each do |year, strings|
+      entries = strings.join(",\n") %>
+      {
+        name: '<%= year %>',
+        data: [
+<%= entries %>
+
+        ]
+      },
+<% end %>
+    ],
+    title: {
+      text: 'Meals served by year'
+    },
+    xAxis: {
+      dateTimeLabelFormats: {
+        day: '%e. %b',
+        week: '%B %e',
+        month: '%B %Y',
+        year: '%Y'
+      },
+      gridLineWidth: 1,
+      type: 'datetime',
+    },
+    yAxis: {
+      gridLineWidth: 1,
+      title: {
+        text: 'Number of plates served'
+      }
+    }
+  });
+});
+
