@@ -80,21 +80,6 @@ get '/round_1/yearly_meals.js' do
 end
 
 get '/round_1/monthly_meals_in_last_year.js' do
-  MONTH_NAMES = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ]
-
   today = Date.today
   meals = 
     CouchDB::get(
@@ -121,7 +106,7 @@ get '/round_1/monthly_meals_in_last_year.js' do
     entry = "          [#{day}, #{number_served}]"
 
     # Either instantiate or add to the year's array of values.
-    key = "#{MONTH_NAMES[month]} #{year}"
+    key = "#{Date::MONTHNAMES[month+1]} #{year}"
     if @months.has_key? key
       @months[key] << entry
     else
@@ -131,4 +116,45 @@ get '/round_1/monthly_meals_in_last_year.js' do
   end
 
   erb :'round_1/monthly_meals_in_last_year.js', content_type: 'application/javascript'
+end
+
+get '/round_1/monthly_meals_year_over_year.js' do
+  today = Date.today
+  @month_name = Date::MONTHNAMES[today.month]
+  start_key = "%02d" % today.month
+  end_key = "%02d" % (today.month+1)
+  meals = 
+    CouchDB::get(
+      CouchDB::uri(
+        URI.escape(
+          %{_design/round_1/_view/monthly_meals?start_key=["#{start_key}"]&end_key=["#{end_key}"]}
+        )))
+
+  @months = Hash.new
+  @month_list = []
+  meals[:rows]&.each do |obj|
+    # obj is a Hash with the following keys:
+    #   _id: the document ID
+    #   key: [month (1-12), year]
+    #   value: [day of month, number of meals served]
+
+    # Parse out all the bits for readability, clarity, and DRYness.
+    month = Integer(obj[:key][0], 10) - 1   # In JS, months range from 0 through 11.
+    year = obj[:key][1]
+    day = obj[:value][0]
+    number_served = obj[:value][1]
+
+    # Render a line of text for the current entry.
+    entry = "[#{day}, #{number_served}]"
+
+    # Either instantiate or add to the year's array of values.
+    if @months.has_key? year
+      @months[year] << entry
+    else
+      @months[year] = [entry]
+    end
+    @month_list << year unless @month_list.include? year
+  end
+
+  erb :'round_1/monthly_meals_year_over_year.js', content_type: 'application/javascript'
 end
