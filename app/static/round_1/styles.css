@@ -1,2 +1,13 @@
-.chart {
+body {
+    font-family: sans-serif;
 }
+
+nav div {
+    margin: 2em 0;
+}
+
+nav .fixed-width {
+    width: 16em;
+    display: inline-block;
+}
+
