@@ -8,77 +8,40 @@ document.addEventListener('DOMContentLoaded', function () {
       series: {
         findNearestPointBy: 'xy',
         marker: {
-          enabled: true
+          enabled: true,
+          radius: 8,
+          symbol: 'circle'
         }
       }
     },
     series: [
-<% @years.each do |year, strings|
-      entries = strings.join(",\n") %>
-      {
-        name: '<%= year %>',
-        data: [
-<%= entries %>
-
-        ],
-<% if year.to_i <= @latest_year - 3 %>
+      <% @months.each do |label, strings|
+        entries = strings.join(",\n") %>
+    {
+      name: '<%= label %>',
+      data: [
+        <%= entries %>
+      ],
+      <% if @month_list[0...-3].include? label %>
         visible: false
-<% end %>
-      },
-<% end %>
+      <% end %>
+    },
+      <% end %>
     ],
     title: {
       text: 'Meals served by month in the last year'
     },
     xAxis: {
-      dateTimeLabelFormats: {
-        day: '%e. %b',
-        week: '%B %e',
-        month: '%B',
-        year: '%Y'
-      },
-      gridLineColor: '#888',
-      gridLineWidth: 1,
-      labels: {
-        formatter: function () {
-          var date = new Date(this.value + 8.64e7);
-          const options = {
-            month: 'long',
-            day: 'numeric'
-          };
-          return date.toLocaleDateString('en-US', options);
-        }
-      },
       plotLines: [
         <% color = '#aaa' %>
-        <% (0..11).each do |month| %>
-          <%# Black bands at the start of each month come from gridlines. %>
-          <% (1..4).each do |week| %>
-            <%# Gray bands at the end of weeks 1, 2, 3, and 4. No need for week 5. %>
+        <% (7.5..31).step(7) do |n| %>
         {
           color: '<%= color %>',
-          dashStyle: 'DashDot',
-          value: Date.UTC(2020, <%= month %>, <%= week * 7 %>, 23, 59, 59),
+          value: <%= n %>
         },
-          <% end %>
         <% end %>
       ],
-      tickmarkPlacement: 'on',
-      tickPositions: [
-        Date.UTC(2020, 0, 1),
-        Date.UTC(2020, 1, 1),
-        Date.UTC(2020, 2, 1),
-        Date.UTC(2020, 3, 1),
-        Date.UTC(2020, 4, 1),
-        Date.UTC(2020, 5, 1),
-        Date.UTC(2020, 6, 1),
-        Date.UTC(2020, 7, 1),
-        Date.UTC(2020, 8, 1),
-        Date.UTC(2020, 9, 1),
-        Date.UTC(2020, 10, 1),
-        Date.UTC(2020, 11, 1)
-      ],
-      type: 'datetime',
+      tickInterval: 1
     },
     yAxis: {
       gridLineColor: '#999',

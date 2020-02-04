@@ -1,4 +1,5 @@
 require_relative '../db/lib/couchdb'
+require 'date'
 require 'sinatra'
 
 set :public_folder, File.dirname(__FILE__) + '/static'
@@ -79,8 +80,31 @@ get '/round_1/yearly_meals.js' do
 end
 
 get '/round_1/monthly_meals_in_last_year.js' do
-  meals = CouchDB::get(CouchDB::uri("_design/round_1/_view/all_meals"))
-  @years = Hash.new
+  MONTH_NAMES = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ]
+
+  today = Date.today
+  meals = 
+    CouchDB::get(
+      CouchDB::uri(
+        URI.escape(
+          %{_design/round_1/_view/all_meals?start_key=["#{today.year-1}","#{"%02d" % today.month}"]}
+        )))
+
+  @months = Hash.new
+  @month_list = []
   meals[:rows]&.each do |obj|
     # obj is a Hash with the following keys:
     #   _id: the document ID
@@ -94,28 +118,17 @@ get '/round_1/monthly_meals_in_last_year.js' do
     number_served = obj[:value]
 
     # Render a line of text for the current entry.
-    # Note: we hard-code a year so that Highcharts will render all lines over one another; Highcharts doesn't know
-    # how to make a "yearly" chart, just a "datetime" chart. This follows the example "Time data with irregular
-    # intervals": https://www.highcharts.com/demo/spline-irregular-time
-    #
-    # We MUST use a leap year to ensure that February 29 is a valid date.
-    entry = "          [Date.UTC(2020, #{month}, #{day}, 17, 30, 0), #{number_served}]"
+    entry = "          [#{day}, #{number_served}]"
 
     # Either instantiate or add to the year's array of values.
-    if @years.has_key? year
-      @years[year] << entry
+    key = "#{MONTH_NAMES[month]} #{year}"
+    if @months.has_key? key
+      @months[key] << entry
     else
-      @years[year] = [entry]
+      @months[key] = [entry]
     end
+    @month_list << key unless @month_list.include? key
   end
-
-  # "Hashes enumerate their values in the order that the corresponding keys were inserted," which might require
-  # us to sort the keys manually and iterate in that order, except that CouchDB stores its views in sorted order,
-  # guaranteeing that we'll process our data sequentially. We can skip the sorting, but using SQLite3 in production
-  # might require sorting, so future Dylan beware! :)
-  #
-  # Similarly, because of the sorting, we can easily pick out the final year from the keys.
-  @latest_year = @years.keys.last.to_i  # Use to_i, not Integer(), to fail relatively gracefully. Should never fail.
 
   erb :'round_1/monthly_meals_in_last_year.js', content_type: 'application/javascript'
 end
