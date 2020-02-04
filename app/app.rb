@@ -55,7 +55,9 @@ get '/round_1/yearly_meals.js' do
     # Note: we hard-code a year so that Highcharts will render all lines over one another; Highcharts doesn't know
     # how to make a "yearly" chart, just a "datetime" chart. This follows the example "Time data with irregular
     # intervals": https://www.highcharts.com/demo/spline-irregular-time
-    entry = "          [Date.UTC(1970, #{month}, #{day}, 17, 30, 0), #{number_served}]"
+    #
+    # We MUST use a leap year to ensure that February 29 is a valid date.
+    entry = "          [Date.UTC(2020, #{month}, #{day}, 17, 30, 0), #{number_served}]"
 
     # Either instantiate or add to the year's array of values.
     if @years.has_key? year

@@ -34,10 +34,121 @@ document.addEventListener('DOMContentLoaded', function () {
       dateTimeLabelFormats: {
         day: '%e. %b',
         week: '%B %e',
-        month: '%B %Y',
+        month: '%B',
         year: '%Y'
       },
       gridLineWidth: 1,
+      labels: {
+        formatter: function () {
+          var date = new Date(this.value + 8.64e7);
+          const options = {
+            month: 'long',
+            day: 'numeric'
+          };
+          return date.toLocaleDateString('en-US', options);
+        }
+      },
+      plotBands: [
+        <% colors = ['#eee', '#ddd', '#ccc', '#bbb', '#aaa'] %>
+        // First 4 weeks (which are all uniform)
+        <% (0..3).each do |week| %>
+          <% (0..11).each do |month| %>
+        {
+          color: '<%= colors[week] %>',
+          from: Date.UTC(2020, <%= month %>, <%= week * 7 + 1 %>),
+          to:   Date.UTC(2020, <%= month %>, <%= week * 7 + 7 %>, 23, 59, 59),
+        },
+          <% end %>
+        <% end %>
+        // Fifth weeks
+        {
+          // January 29-31
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 0, 29),
+          to:   Date.UTC(2020, 0, 31, 23, 59, 59)
+        },
+        {
+          // February 29 (leap year, remember?)
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 1, 29),
+          to:   Date.UTC(2020, 1, 29, 23, 59, 59)
+        },
+        {
+          // March 29-31
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 2, 29),
+          to:   Date.UTC(2020, 2, 31, 23, 59, 59)
+        },
+        {
+          // April 29-30
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 3, 29),
+          to:   Date.UTC(2020, 3, 30, 23, 59, 59)
+        },
+        {
+          // May 29-31
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 4, 29),
+          to:   Date.UTC(2020, 4, 31, 23, 59, 59)
+        },
+        {
+          // June 29-30
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 5, 29),
+          to:   Date.UTC(2020, 5, 30, 23, 59, 59)
+        },
+        {
+          // July 29-31
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 6, 29),
+          to:   Date.UTC(2020, 6, 31, 23, 59, 59)
+        },
+        {
+          // August 29-31
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 7, 29),
+          to:   Date.UTC(2020, 7, 31, 23, 59, 59)
+        },
+        {
+          // September 29-30
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 8, 29),
+          to:   Date.UTC(2020, 8, 30, 23, 59, 59)
+        },
+        {
+          // October 29-31
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 9, 29),
+          to:   Date.UTC(2020, 9, 31, 23, 59, 59)
+        },
+        {
+          // November 29-30
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 10, 29),
+          to:   Date.UTC(2020, 10, 30, 23, 59, 59)
+        },
+        {
+          // December 29-31
+          color: '<%= colors[4] %>',
+          from: Date.UTC(2020, 11, 29),
+          to:   Date.UTC(2020, 11, 31, 23, 59, 59)
+        },
+      ],
+      tickmarkPlacement: 'on',
+      tickPositions: [
+        Date.UTC(2020, 0, 1),
+        Date.UTC(2020, 1, 1),
+        Date.UTC(2020, 2, 1),
+        Date.UTC(2020, 3, 1),
+        Date.UTC(2020, 4, 1),
+        Date.UTC(2020, 5, 1),
+        Date.UTC(2020, 6, 1),
+        Date.UTC(2020, 7, 1),
+        Date.UTC(2020, 8, 1),
+        Date.UTC(2020, 9, 1),
+        Date.UTC(2020, 10, 1),
+        Date.UTC(2020, 11, 1)
+      ],
       type: 'datetime',
     },
     yAxis: {
