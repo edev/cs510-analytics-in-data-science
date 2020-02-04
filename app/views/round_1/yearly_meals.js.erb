@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
         month: '%B',
         year: '%Y'
       },
+      gridLineColor: '#888',
       gridLineWidth: 1,
       labels: {
         formatter: function () {
@@ -48,91 +49,19 @@ document.addEventListener('DOMContentLoaded', function () {
           return date.toLocaleDateString('en-US', options);
         }
       },
-      plotBands: [
-        <% colors = ['#eee', '#ddd', '#ccc', '#bbb', '#aaa'] %>
-        // First 4 weeks (which are all uniform)
-        <% (0..3).each do |week| %>
-          <% (0..11).each do |month| %>
+      plotLines: [
+        <% color = '#aaa' %>
+        <% (0..11).each do |month| %>
+          <%# Black bands at the start of each month come from gridlines. %>
+          <% (1..4).each do |week| %>
+            <%# Gray bands at the end of weeks 1, 2, 3, and 4. No need for week 5. %>
         {
-          color: '<%= colors[week] %>',
-          from: Date.UTC(2020, <%= month %>, <%= week * 7 + 1 %>),
-          to:   Date.UTC(2020, <%= month %>, <%= week * 7 + 7 %>, 23, 59, 59),
+          color: '<%= color %>',
+          dashStyle: 'DashDot',
+          value: Date.UTC(2020, <%= month %>, <%= week * 7 %>, 23, 59, 59),
         },
           <% end %>
         <% end %>
-        // Fifth weeks
-        {
-          // January 29-31
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 0, 29),
-          to:   Date.UTC(2020, 0, 31, 23, 59, 59)
-        },
-        {
-          // February 29 (leap year, remember?)
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 1, 29),
-          to:   Date.UTC(2020, 1, 29, 23, 59, 59)
-        },
-        {
-          // March 29-31
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 2, 29),
-          to:   Date.UTC(2020, 2, 31, 23, 59, 59)
-        },
-        {
-          // April 29-30
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 3, 29),
-          to:   Date.UTC(2020, 3, 30, 23, 59, 59)
-        },
-        {
-          // May 29-31
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 4, 29),
-          to:   Date.UTC(2020, 4, 31, 23, 59, 59)
-        },
-        {
-          // June 29-30
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 5, 29),
-          to:   Date.UTC(2020, 5, 30, 23, 59, 59)
-        },
-        {
-          // July 29-31
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 6, 29),
-          to:   Date.UTC(2020, 6, 31, 23, 59, 59)
-        },
-        {
-          // August 29-31
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 7, 29),
-          to:   Date.UTC(2020, 7, 31, 23, 59, 59)
-        },
-        {
-          // September 29-30
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 8, 29),
-          to:   Date.UTC(2020, 8, 30, 23, 59, 59)
-        },
-        {
-          // October 29-31
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 9, 29),
-          to:   Date.UTC(2020, 9, 31, 23, 59, 59)
-        },
-        {
-          // November 29-30
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 10, 29),
-          to:   Date.UTC(2020, 10, 30, 23, 59, 59)
-        },
-        {
-          // December 29-31
-          color: '<%= colors[4] %>',
-          from: Date.UTC(2020, 11, 29),
-          to:   Date.UTC(2020, 11, 31, 23, 59, 59)
-        },
       ],
       tickmarkPlacement: 'on',
       tickPositions: [
@@ -152,7 +81,9 @@ document.addEventListener('DOMContentLoaded', function () {
       type: 'datetime',
     },
     yAxis: {
+      gridLineColor: '#999',
       gridLineWidth: 1,
+      tickInterval: 100,
       title: {
         text: 'Number of plates served'
       }
