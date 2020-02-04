@@ -69,6 +69,9 @@ get '/round_1/yearly_meals.js' do
   # us to sort the keys manually and iterate in that order, except that CouchDB stores its views in sorted order,
   # guaranteeing that we'll process our data sequentially. We can skip the sorting, but using SQLite3 in production
   # might require sorting, so future Dylan beware! :)
+  #
+  # Similarly, because of the sorting, we can easily pick out the final year from the keys.
+  @latest_year = @years.keys.last.to_i  # Use to_i, not Integer(), to fail relatively gracefully. Should never fail.
 
   erb :'round_1/yearly_meals.js', content_type: 'application/javascript'
 end

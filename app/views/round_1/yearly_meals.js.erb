@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
         data: [
 <%= entries %>
 
-        ]
+        ],
+<% if year.to_i <= @latest_year - 3 %>
+        visible: false
+<% end %>
       },
 <% end %>
     ],
