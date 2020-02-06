@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', function () {
           enabled: true,
           radius: 8,
           symbol: 'circle'
+        },
+        tooltip: {
+          headerFormat: '<span style="font-size: 10px"><%= @month_name %> {point.key}, {series.name}</span><br/>',
+          pointFormat: '<b>{point.y}</b><br />'
         }
       }
     },
