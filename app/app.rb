@@ -9,8 +9,8 @@ get '/' do
   send_file File.expand_path('index.html', settings.public_folder)
 end
 
-get '/_all_docs' do
-  CouchDB::get(CouchDB::uri("_all_docs")).inspect
+get '/round_1/index.html' do
+  erb :'round_1/index.html'
 end
 
 get '/round_1/all_meals.js' do
@@ -118,11 +118,21 @@ get '/round_1/monthly_meals_in_last_year.js' do
   erb :'round_1/monthly_meals_in_last_year.js', content_type: 'application/javascript'
 end
 
-get '/round_1/monthly_meals_year_over_year.js' do
-  today = Date.today
-  @month_name = Date::MONTHNAMES[today.month]
-  start_key = "%02d" % today.month
-  end_key = "%02d" % (today.month+1)
+get '/round_1/monthly_meals_year_over_year/:month' do
+  month = params[:month]
+  @month_number = Date::MONTHNAMES.index(month)
+  erb :'round_1/monthly_meals_year_over_year.html'
+end
+
+get '/round_1/monthly_meals_year_over_year/:month/chart' do
+  month_number = params[:month].to_i
+  if month_number < 1 || month_number > 12
+    redirect '/round_1/index.html'
+  end
+
+  @month_name = Date::MONTHNAMES[month_number]
+  start_key = "%02d" % month_number
+  end_key = "%02d" % (month_number+1)
   meals = 
     CouchDB::get(
       CouchDB::uri(

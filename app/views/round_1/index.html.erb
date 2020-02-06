@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Dashboard (round 1)
+    </title>
+
+    <link rel="stylesheet" href="/round_1/styles.css" />
+  </head>
+
+  <body>
+    <h1>
+      Dashboard (round 1)
+    </h1>
+
+    <nav>
+      <div>
+        <span class="fixed-width">
+          All meals:
+        </span>
+        <span class="fixed-width">
+          <a href="all_meals.html">
+            Link
+          </a>
+        </span>
+      </div>
+
+      <div>
+        <span class="fixed-width">
+          Yearly meals:
+        </span>
+        <span class="fixed-width">
+          <a href="yearly_meals.html">
+            Link
+          </a>
+        </span>
+      </div>
+
+      <div>
+        <span class="fixed-width">
+          Monthly meals in the last year:
+        </span>
+        <span class="fixed-width">
+          <a href="monthly_meals_in_last_year.html">
+            Link
+          </a>
+        </span>
+      </div>
+
+      <div>
+        <div class="fixed-width">
+          Monthly meals, year over year:
+        </div>
+        <div class="fixed-width">
+          <% Date::MONTHNAMES[1..].each do |month| %>
+            <a href="monthly_meals_year_over_year/<%= month %>">
+              <%= month %>
+            </a>
+            <br />
+            <br />
+          <% end %>
+        </div>
+      </div>
+    </nav>
+
+    <script src="/highcharts-8.0.0.js"></script>
+  </body>
+</html>
