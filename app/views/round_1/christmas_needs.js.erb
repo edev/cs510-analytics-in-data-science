@@ -29,17 +29,17 @@ document.addEventListener('DOMContentLoaded', function () {
     title: {
       text: 'Percent progress toward Christmas goals'
     },
-    xAxis: [{
+    xAxis: {
       categories: <%= @categories.inspect %>
-    }],
-    yAxis: [{
+    },
+    yAxis: {
+      max: 100,
       plotLines: [{
-        color: 'green',
-        width: 9,
-        value: 10,
+        color: 'black',
+        value: 100,
         zIndex: 1.67
       }],
-    }]
+    }
   });
 });
 

@@ -13,12 +13,17 @@ function (doc) {
     var end = doc._id.lastIndexOf('/'); // Slice off the date, leaving just need_slug.
     var need_slug = doc._id.substring(start, end );
 
+    var value = {
+      goal: doc.goal,
+      sign_ups: doc.sign_ups
+    }
+    if(doc.adjustments && doc.adjustments.adjustment) {
+      value.adjustment = doc.adjustments.adjustment;
+    }
+    
     emit(
       [year, need_slug],
-      {
-        goal: doc.goal,
-        sign_ups: doc.sign_ups
-      }
+      value
     );
   }
 }
