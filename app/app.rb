@@ -168,3 +168,7 @@ get '/round_1/monthly_meals_year_over_year/:month/chart' do
 
   erb :'round_1/monthly_meals_year_over_year.js', content_type: 'application/javascript'
 end
+
+get '/round_1/christmas_goals.js' do
+  erb :'/round_1/christmas_goals.js', content_type: 'application/javascript'
+end

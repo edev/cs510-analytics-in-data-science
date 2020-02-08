@@ -1,0 +1,44 @@
+document.addEventListener('DOMContentLoaded', function () {
+  var chart = Highcharts.chart({
+    chart: {
+      renderTo: 'christmas_goals',
+      type: 'bar'
+    },
+    plotOptions: {
+      bar: {
+        stacking: 'normal'
+      }
+    },
+    series: [
+      {
+        name: '2019',
+        data: [80, 95, 70, 35, 60],
+      },
+      {
+        name: '2018 (last X days)',
+        data: [6, 10, 5, 23, 0],
+        stack: '2018'
+      },
+      {
+        name: '2018 by X days before Christmas',
+        data: [76, 30, 85, 67, 95],
+        stack: '2018'
+      },
+    ],
+    title: {
+      text: 'Percent progress toward Christmas goals'
+    },
+    xAxis: {
+      categories: [
+        'Gifts and toys',
+        'Gym decorators',
+        'Hand stampers',
+        'Hot chocolatiers',
+        'Individually wrapped candy'
+      ]
+    }
+  });
+});
+
+
+
