@@ -1,0 +1,47 @@
+2 basic questions:
+    My understanding is correct.
+
+Every year for the last few years, we've had a few hundred gifts and such that store and should track on the website.
+
+Make a PDF of the graphs for Fearless Leader to print
+    - Month by month in last year: choose July (ABOTA meal), December, and a  month with a 100-200 increase over the course of the year.
+    - Meals served each April: 2016, 2018, 2019. 
+
+All meals:
+    - Immediately confirms the overall trend; very helpful to have!
+
+Year over year:
+    - Works great for looking at patterns, big winner!
+    - Last 3 years of data works well.
+
+Meals served by month in the last year:
+    - Very little variation from start to end of month
+    - Helpful observation, but makes the graph a bit less interesting or useful.
+    - Keep the graph, even so.
+    - We do NOT need to add the ability to draw previous years' graphs; we can access historical data well enough via those graphs.
+    - This is mostly useful for pulling screenshots for meetings.
+    - Because there's not really an identifiable trend between months that can go into a policy decision.
+
+Meals served each (January, etc.):
+    - He likes being able to enable or disable plots
+    - Very telling, immediately.
+    - Very clear way of showing trends over the years
+    - Trends from start to end of month tend to be flatter than anticipated
+    - Very useful for Fearless Leader!
+
+Christmas:
+    - Separate volunteer & donation by categories.
+    - Doesn't need it to show beyond 100%, but do want to have SOME indication of it.
+    - Need to be able to see the raw number. Put it in the tooltip. That's very important.
+        - Ideally on the last year bars (green & black), have BOTH the partial and overall raw numbers in the tooltips.
+    - Added percent numbers to the bars. They look fine. Takes strain off, so you don't have to align w/ the lines & count lines.
+    - Add percent signs to the numbers.
+    - Remove the 0s on the blacks only if it's easy.
+    - Asked about a heat map instead, and he strongly prefers to see the results in dimension/space over color.
+      - He's really good at spatial relations.
+    - Play with other ways of spatially presenting this info and present options next week. (Like a grid of pie charts?)
+
+Overall:
+    - See how practical it is to make colors consistent between related graphs, e.g. Meals served each (month) when 2020 is or is not on the graph.
+    - Date ranges: For now, keep date ranges as they are, but in the future, we might want to tweak date ranges, e.g. cutting off older years.
+    - Definitely time to play with colors and type.
