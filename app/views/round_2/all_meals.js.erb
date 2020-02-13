@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var chart = Highcharts.chart({
     chart: {
       renderTo: 'all_meals',
+      styledMode: true,
       type: 'line',
       zoomType: 'x'
     },
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     series: [{
       name: 'Meals served',
+      color: '#00429d',
       data: [
 <%= @data %>
       ]

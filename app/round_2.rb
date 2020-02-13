@@ -6,6 +6,10 @@ class Round2 < Sinatra::Base
     erb :'round_2/index.html'
   end
 
+  get '/round_2/styles.css' do
+    erb :'round_2/styles.css', content_type: 'text/css'
+  end
+
   get '/round_2/all_meals.js' do
     meals = CouchDB::get(CouchDB::uri("_design/round_2/_view/all_meals"))
     puts "Meals: ", meals
