@@ -1,0 +1,50 @@
+document.addEventListener('DOMContentLoaded', function () {
+  var chart = Highcharts.chart({
+    chart: {
+      renderTo: 'christmas_goals',
+      type: 'bar'
+    },
+    plotOptions: {
+      bar: {
+        dataLabels: {
+          enabled: true
+        },
+        stacking: 'normal'
+      }
+    },
+    series: [
+      /* The order of stacking appears to be determined by reverse series order. */
+      {
+        name: '2019',
+        data: <%= @data_this_year.inspect %>
+      },
+      {
+        name: '2018 (last 14 days)',
+        data: <%= @data_last_year_total.inspect %>,
+        stack: '2018'
+      },
+      {
+        name: '2018 by 14 days before Christmas',
+        data: <%= @data_last_year.inspect%>,
+        stack: '2018'
+      },
+    ],
+    title: {
+      text: 'Percent progress toward Christmas goals'
+    },
+    xAxis: {
+      categories: <%= @categories.inspect %>
+    },
+    yAxis: {
+      max: 100,
+      plotLines: [{
+        color: 'black',
+        value: 100,
+        zIndex: 1.67
+      }],
+    }
+  });
+});
+
+
+
