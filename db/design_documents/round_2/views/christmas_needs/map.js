@@ -3,6 +3,7 @@ function (doc) {
   if(doc._id
     && doc._id.indexOf('needs') == 0
     && doc.goal
+    && doc.page
     && doc.sign_ups) { // NOTE: In production, need to account for adjustments, too!
 
     var year_matcher = /\d{4}$/;
@@ -15,6 +16,7 @@ function (doc) {
 
     var value = {
       goal: doc.goal,
+      page: doc.page,
       sign_ups: doc.sign_ups
     }
     if(doc.adjustments && doc.adjustments.adjustment) {

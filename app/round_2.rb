@@ -167,7 +167,12 @@ class Round2 < Sinatra::Base
     erb :'round_2/monthly_meals_year_over_year.js', content_type: 'application/javascript'
   end
 
-  get '/round_2/christmas_needs.js' do
+  get '/round_2/christmas_needs/:need_type' do
+    @need_type = params[:need_type]
+    erb :'round_2/christmas_needs.html'
+  end
+
+  get '/round_2/christmas_needs/:need_type/chart' do
     # First, compute the dates we'll need to reference.
     DAYS_BEFORE = 14
     dinner_this_year = Date.parse(CouchDB::get(CouchDB::uri(CouchDB::token('christmas/2019')))[:dates][:dinner])
@@ -188,6 +193,10 @@ class Round2 < Sinatra::Base
     raw_data_this_year[:rows]&.each do |row|
       need_slug = row[:key][1].to_sym
       goal = row[:value][:goal]
+
+      # Note: we could optimize this by moving page to the key, then sorting & filtering accordingly.
+      page = row[:value][:page]
+      next unless page == params[:need_type]
 
       # Note: in CouchDB, adjustments should be an array of objects but is just a single object.
       adjustment = row[:value][:adjustment].to_i
