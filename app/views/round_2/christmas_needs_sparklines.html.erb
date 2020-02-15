@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Christmas needs (sparklines): <%= @need_type %>
+  </title>
+
+  <link rel="stylesheet" href="https://code.highcharts.com/css/highcharts.css" />
+  <link rel="stylesheet" href="/round_2/styles.css" />
+  <link rel="stylesheet" href="/round_2/christmas_needs.css" />
+  </head>
+
+  <body>
+    <table>
+      <thead>
+        <tr>
+          <th>
+            Need name
+          </th>
+          <th>
+            Last 4 years
+          </th>
+          <th>
+            Current
+          </th>
+          <th>
+            Goal
+          </th>
+          <th>
+            Percent
+          </th>
+        </tr>
+      </thead>
+      <% @needs.each do |need_slug, need| %>
+        <tr>
+
+          <!-- Need name -->
+          <td>
+            <%= need_slug.to_s.gsub('_', ' ').capitalize %>
+          </td>
+
+          <!-- Last 4 years -->
+          <td data-so-far="<%= need[:years].map { |y, vals| vals[:so_far] }.join(',') %>"
+              data-final="<%= need[:years].map { |y, vals| vals[:final] }.compact.join(',') %>">
+            Call Dylan.
+          </td>
+
+          <!-- Current -->
+          <td>
+            <%= need[:current] %>
+          </td>
+
+          <!-- Goal -->
+          <td>
+            <%= need[:goal] %>
+          </td>
+
+          <!-- Percent -->
+          <td>
+            <%= need[:percent] %>
+          </td>
+
+        </tr>
+      <% end %>
+    </table>
+
+    <div id="christmas_goals" class="chart"></div>
+
+    <script src="/jquery-3.4.1.js"></script>
+    <script src="/highcharts-8.0.0.js"></script>
+    <script src="/round_2/christmas_needs/sparklines/<%= @need_type %>/chart"></script>
+  </body>
+</html>
+
+
