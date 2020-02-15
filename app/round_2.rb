@@ -353,7 +353,7 @@ class Round2 < Sinatra::Base
           .reduce(0, :+)                                                          # Sum quantities.
 
         # Fill in the current year's percentage for the last DAYS_BEFORE days, except for the current year.
-        @needs[need_slug][:years][year][:final] = (year_final.to_f / goal * 100).to_i unless year == LATEST_YEAR
+        @needs[need_slug][:years][year][:final] = year_final unless year == LATEST_YEAR
       end
     end
 
@@ -398,7 +398,7 @@ class Round2 < Sinatra::Base
   get '/round_2/christmas_needs/sparklines/:need_type/chart' do
     @need_type = params[:need_type]
 
-    erb :'/round_2/christmas_needs_sparklines.js'
+    erb :'/round_2/christmas_needs_sparklines.js', content_type: 'application/javascript'
   end
 
 end

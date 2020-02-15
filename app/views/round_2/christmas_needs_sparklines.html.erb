@@ -37,13 +37,15 @@
         <tr>
 
           <!-- Need name -->
-          <td>
+          <td style="vertical-align: middle; text-align: right;">
             <%= need_slug.to_s.gsub('_', ' ').capitalize %>
           </td>
 
           <!-- Last 4 years -->
           <td data-so-far="<%= need[:years].map { |y, vals| vals[:so_far] }.join(',') %>"
-              data-final="<%= need[:years].map { |y, vals| vals[:final] }.compact.join(',') %>">
+              data-final="<%= need[:years].map { |y, vals| vals[:final] }.compact.join(',') %>"
+              data-goal="<%= need[:goal] %>"
+              style="padding: 0.5em 1em;">
             Call Dylan.
           </td>
 
