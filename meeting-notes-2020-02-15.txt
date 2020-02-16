@@ -1,2 +1,98 @@
 Progress since last week:
     - Christmas: separated volunteer & donation needs.
+    - Christmas: Added sparklines and gauges
+    - Set up behind the scenes for fancy color work, but color schemes are a WIP.
+
+Possible reasons for fewer people coming to dinner:
+    - More people on the streets, anecdotally, but that could be bias, or there could be more people. The economy is down, we're seeing low numbers, yet volunteers feel like they're seeing more people on the streets. We don't know why.
+
+Missing data sources:
+    - Stockpiles
+    - Donations that don't get entered (e.g. sponaneous donations)
+        - What we know we can expect last-minute.
+    Probably 60% of our gifts and toys come from these two sources.
+    Once the graphs are implemented, it will probably be very useful to look at ways to record these data sources and make the website part of a central repository of information.
+    After dinner, Christmas Queen can give a pretty good guess about how many are going into storage
+    Mary house numbers, we don't have, but on the day of the wrapping party, we have a pretty good idea +/- 10% of how many gifts we have.
+    Overall, data visualizatiaon will make this much more central and important - much more than a website. (Fearless Leader agrees, especially with Christmas, since it's "sort of crisis-driven".)
+    Tracking that in detail requires us also to break down toys by category.
+
+Donations:
+    What these charts really show is that we're always struggling to get the donations we need.
+    The goals reflect what we need, but we only show as getting maybe 10-20% in most donation categories.
+    On 3-4 categories (toys, candy), we generally DO get to 100% or so.
+    White sport socks, if we don't get them, we have to buy them last-minute.
+    Toothbrushes and toothpaste are all over the place, and if we don't get them, we give away what we do get.
+
+Sparklines:
+    Suffers just like stacked bars from the limitations of missing data sources, which paints a too-bleak picture.
+    Leaning slightly to stacked bar charts.
+        - Likes the compactness (unsurprisingly).
+        - Prefers stacked bar charts (if similarly compact).
+    Sparklines are confusing because they pertain to different events.
+        - Last 4 years - not needed at all, because it's actually much clearer on the sign-up timeline! 
+    Loves the sign-up timeline from the summer!
+        - VERY easy for FL to parse.
+    FL DOES currently go through about all 33 by hand each year, looking at them.
+        - About 10-15 could be eliminated out-of-hand, particularly key volunteers. Many are single-fill categories, e.g. Christmas Queen or my job.
+            - FL doesn't necessarily need a full display for these, but he DOES absolutely need to know if they're not filled.
+              They're generally very important jobs, and all or mostly volunteers.
+            - So a table showing the status for these is what he really needs.
+        - For the rest, we want timelines, with a good interface to navigate them.
+            - Prev and next buttons plus a drop-down for navigating these with one timeline per page.
+
+Gauges:
+    Love them, if compact!
+    The gauges are better than the bar chart.
+
+Overall winner for any brief chart: gauges.
+
+A page of gauges, click to bring up timeline.
+    - In production, we'll consider adding the navigation to the timelines as a bonus.
+    - But in practice, FL probably won't want to go through all timelines, with gauges available. He'll want to use the timelines to dig into empty gauges
+      - He'll use the gauges to gauge overall progress, and when he sees one that's not filled, he will click to see the timeline to understand why. (For instance, do we normally get a bump in that category later? Or did we miss one? What's the story, given historical data? When I look at this, should I be concerned?)
+
+4 categories for volunteers: Fearless Leader broke them down into these categories for his own planning.
+    1. Total (large) number: gauges.
+        Choir singers
+        Present wrappers
+
+    2. Reserve ahead: 2-10 people that I need to have confirmation before the dinner, at least 2 weeks, generally: gauges.
+        Final cleaner-uppers
+        Gift buyers
+        Gym decarators
+        Hot chocolatiers
+        Line monitors
+        Santa's elves
+        Sign makers
+        Snack server
+
+    Merge categories 1 and 2 into one group
+
+    3. On the day: 2-10 people whom I can pick that day, i.e. veterans in reserve: gauges, definitely on a separate page so FL doesn't have to look at it unless he's curious. He mostly won't even look.
+        Adult-child distribution teams
+        Gift organizers
+        Last-minute present wrappers
+        Photo shoot assistant
+        Present sorters
+        Veterans in reserve
+
+    4. 1-2 people who are directors: No gauges for category 4. Almost a sidebar on the same page as 1-2.
+        Choir coordinator
+        General coordinator for presents
+        Photographer
+        Piano player accompanist
+        Santa
+        Stocking manager
+        Tech-savvy photo printer
+
+    Needs a very clear yes/no. Does not need ANY more info, because if any of these are not filled 35-40 days ahead, he absolutely needs to get that filled.
+
+Donations:
+
+    Just a grid of gauges with timelines on click, on its own page.
+
+Hand stampers: eliminate this in future years, since adult-child distribution teams stamp hands. Don't include in analysis above.
+Photo frame artists: eliminate this in future years. We buy frames.
+
+A LOT of this same type of work is very useful for event planners of other kinds of events, in FL's experience and judgement.
