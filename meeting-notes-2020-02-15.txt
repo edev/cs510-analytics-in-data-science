@@ -96,3 +96,8 @@ Hand stampers: eliminate this in future years, since adult-child distribution te
 Photo frame artists: eliminate this in future years. We buy frames.
 
 A LOT of this same type of work is very useful for event planners of other kinds of events, in FL's experience and judgement.
+
+Conclusion/lessons from the meeting:
+
+    With respect to Christmas, We're essentially working to find the few ways of visualizing data that are useful for event plananing. In a production system, we will want to let the user divide needs into categories and choose from a number of different ways to display categories, including things like gauges and simple yes/no information.
+
