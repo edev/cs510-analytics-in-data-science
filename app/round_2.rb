@@ -272,20 +272,70 @@ class Round2 < Sinatra::Base
     erb :'/round_2/christmas_needs.css', content_type: 'text/css'
   end
 
-  get '/round_2/christmas_needs/sparklines/:need_type' do
-    @need_type = params[:need_type]
-
-    YEARS = (2016..2019).to_a.reverse   # [2019, ..., 2016]
-    LATEST_YEAR = YEARS[0]
-    DAYS_BEFORE = 14
+  ##
+  # Returns a needs hash suitable for rendering various Christmas charts.
+  #
+  # Arguments:
+  #   need_type: a string for the need type that will match against CouchDB documents' page fields, e.g. 'volunteer'
+  #     or 'donate'.
+  #   years: a collection of years, where the first item in the collection (when enumerated) dictates which needs
+  #     are included and which ones are not. For instance, given [2019, 2018, 2017], only needs present in 2019 will
+  #     be part of the returned needs Hash. The years may be arbitrary and will be processed individually in
+  #     enumeration order.
+  #   cutoff: the number of days before the event that we suppose might remain when the user views a visualization.
+  #     Presumably this is 14. 0 is untested but might work. Negative numbers are untested and discouraged. Fractional
+  #     or decimal numbers are discouraged.
+  #
+  # The first year in years is referred to in this function as the canonical year, as it defines the canonical list
+  # of needs.
+  #
+  # The a needs Hash associates each need_slug with a Hash that has the following keys:
+  #   :goal is the need's goal according to the canonical year.
+  #   :current is the canonical year's :so_far value.
+  #   :percent is the canonical year's :so_far value as a percent of goal.
+  #   :years is a Hash with one key for each year we opted to include in the code above.
+  #     The value for each year is a Hash with the following keys:
+  #       :so_far holds the percentage of sign-ups toward the goal as of the cutoff number of days before the event.
+  #       :final (present for all years except the canonical year) holds the percentage of sign-ups toward the goal,
+  #         counting only those that came in after the cutoff for :so_far.
+  #
+  # Note: Percents are stored as integers, e.g. 53 for 53%.
+  #
+  # Example:
+  #
+  # needs_for('volunteers', (2017..2019).to_a.reverse, 14) =>
+  # {
+  #   hot_chocolatiers: {
+  #     goal: 120,
+  #     current: 300,
+  #     percent: 250,
+  #     years: {
+  #       2017: {
+  #         so_far: 12,
+  #         final: 7
+  #       },
+  #       2018: {
+  #         so_far: 89,
+  #         final: 6
+  #       },
+  #       2019: {   # 2019 == the canonical year
+  #         so_far: 300   # Perhaps we received way too many sign-ups.
+  #       }
+  #     }
+  #   },
+  #   ...
+  # }
+  def needs_for(need_type, years, cutoff)
+    canonical_year = years[0]
+    cutoff = 14
 
     dinner_dates = {}
     cutoff_dates = {}
     raw_data = {}
-    YEARS.each do |year| 
+    years.each do |year| 
       # Compute the dates we'll need to reference.
       dinner_dates[year] = Date.parse(CouchDB::get(CouchDB::uri(CouchDB::token("christmas/#{year}")))[:dates][:dinner])
-      cutoff_dates[year] = dinner_dates[year] - DAYS_BEFORE
+      cutoff_dates[year] = dinner_dates[year] - cutoff
 
       # Retrieve raw data from the view.
       start_key = CouchDB::token %{["#{year}"]}
@@ -296,7 +346,7 @@ class Round2 < Sinatra::Base
 
     # Process each year's data for each need, collecting results into the needs Hash.
 
-    @needs = Hash.new
+    needs = Hash.new
     raw_data.each do |year, raw_data|
       raw_data[:rows]&.each do |row|
         need_slug = row[:key][1].to_sym
@@ -304,9 +354,9 @@ class Round2 < Sinatra::Base
 
         # Note: we could optimize this by moving page to the key, then sorting & filtering accordingly.
         page = row[:value][:page]
-        next unless page == @need_type
+        next unless page == need_type
 
-        if year == LATEST_YEAR
+        if year == canonical_year
           # Add this need to the data structures we're building.
 
           # Note for future Dylan:
@@ -317,14 +367,14 @@ class Round2 < Sinatra::Base
           # 1. ONLY include needs in the needs Hash if they are present THIS YEAR.
           # 2. Pull all names, etc. from this year's set of names.
 
-          @needs[need_slug] = {
+          needs[need_slug] = {
             goal: goal,
             years: {}
           }
 
           # Note: we do NOT want to use the title of each need, because it might contain distracting information
           # like "on 12/14 and 12/17". Better to transform the need slug.
-        elsif !@needs.has_key? need_slug
+        elsif !needs.has_key? need_slug
           # The current year doesn't have this need, so exclude it from the data set.
           next
         end
@@ -340,10 +390,10 @@ class Round2 < Sinatra::Base
         year_so_far += adjustment                                                 # Add adjustments.
 
         # Fill in the current year's progress and percentage.
-        @needs[need_slug][:current] = year_so_far
-        @needs[need_slug][:percent] = (year_so_far.to_f / goal * 100).to_i
-        @needs[need_slug][:years][year] = {
-          so_far: @needs[need_slug][:current]
+        needs[need_slug][:current] = year_so_far
+        needs[need_slug][:percent] = (year_so_far.to_f / goal * 100).to_i
+        needs[need_slug][:years][year] = {
+          so_far: needs[need_slug][:current]
         }
 
         year_final =
@@ -352,45 +402,16 @@ class Round2 < Sinatra::Base
           .map { |hash| hash[:quantity] }                                         # Keep only quantity.
           .reduce(0, :+)                                                          # Sum quantities.
 
-        # Fill in the current year's percentage for the last DAYS_BEFORE days, except for the current year.
-        @needs[need_slug][:years][year][:final] = year_final unless year == LATEST_YEAR
+        # Fill in the current year's percentage for the last cutoff days, except for the current year.
+        needs[need_slug][:years][year][:final] = year_final unless year == canonical_year
       end
     end
+    needs
+  end
 
-    # The @needs Hash we've now built associates each need_slug with a Hash that has the following keys:
-    #   :goal is the need's goal according to LATEST_YEAR.
-    #   :current is the LATEST_YEAR's :so_far value.
-    #   :percent is the LATEST_YEAR's :so_far value as a percent of goal.
-    #   :years is a Hash with one key for each year we opted to include in the code above.
-    #     The value for each year is a Hash with the following keys:
-    #       :so_far holds the percentage of sign-ups toward the goal as of DAYS_BEFORE days before the event.
-    #       :final (present for all years except LATEST_YEAR) holds the percentage of sign-ups toward the goal,
-    #         counting only those that came in after the cutoff for :so_far.
-    #
-    # Note: Percents are stored as integers, e.g. 53 for 53%.
-    #
-    # Example:
-    #
-    # {
-    #   hot_chocolatiers: {
-    #     goal: 120,
-    #     current: 300,
-    #     years: {
-    #       2017: {
-    #         so_far: 12,
-    #         final: 7
-    #       },
-    #       2018: {
-    #         so_far: 89,
-    #         final: 6
-    #       },
-    #       2019: {   # 2019 == LATEST_YEAR
-    #         so_far: 300   # Perhaps we received way too many sign-ups.
-    #       }
-    #     }
-    #   },
-    #   ...
-    # }
+  get '/round_2/christmas_needs/sparklines/:need_type' do
+    @need_type = params[:need_type]
+    @needs = needs_for(@need_type, (2016..2019).to_a.reverse, 14)
 
     erb :'/round_2/christmas_needs_sparklines.html'
   end
@@ -403,6 +424,7 @@ class Round2 < Sinatra::Base
 
   get '/round_2/christmas_needs/gauges/:need_type' do
     @need_type = params[:need_type]
+    @needs = needs_for(@need_type, (2016..2019).to_a.reverse, 14)
 
     erb :'/round_2/christmas_needs_gauges.html'
   end

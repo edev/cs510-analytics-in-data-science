@@ -12,8 +12,17 @@
   </head>
 
   <body>
-    <div id="christmas_goals" class="chart"></div>
+    <% @needs.each do |need_slug, need| %>
+      <div id="<%= need_slug %>"
+           class="chart"
+           data-goal="<%= need[:goal] %>"
+           data-percent="<%= need[:percent] %>"
+           data-current="<%= need[:current] %>"
+           data-title="<%= need_slug.to_s.gsub('_', ' ').capitalize %>">
+      </div>
+    <% end %>
 
+    <script src="/jquery-3.4.1.js"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
     <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
