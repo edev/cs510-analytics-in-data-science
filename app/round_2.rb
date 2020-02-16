@@ -401,4 +401,16 @@ class Round2 < Sinatra::Base
     erb :'/round_2/christmas_needs_sparklines.js', content_type: 'application/javascript'
   end
 
+  get '/round_2/christmas_needs/gauges/:need_type' do
+    @need_type = params[:need_type]
+
+    erb :'/round_2/christmas_needs_gauges.html'
+  end
+
+  get '/round_2/christmas_needs/gauges/:need_type/chart' do
+    @need_type = params[:need_type]
+
+    erb :'/round_2/christmas_needs_gauges.js', content_type: 'application/javascript'
+  end
+
 end

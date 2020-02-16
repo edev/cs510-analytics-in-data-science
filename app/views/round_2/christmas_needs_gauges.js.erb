@@ -1,0 +1,29 @@
+document.addEventListener('DOMContentLoaded', function () {
+  var chart = Highcharts.chart({
+    chart: {
+      renderTo: 'christmas_goals',
+      styledMode: true,
+      type: 'solidgauge'
+    },
+    pane: {
+      background: {
+        innerRadius: '60%',
+        outerRadius: '100%',
+        shape: 'arc'
+      },
+      endAngle: 90,
+      startAngle: -90
+    },
+    series: [{
+      name: 'A',
+      data: [40]
+    }, {
+      name: 'B',
+      data: '60'
+    }],
+    yAxis: [{
+      min: 0,
+      max: 100
+    }]
+  });
+});
