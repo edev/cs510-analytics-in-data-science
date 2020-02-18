@@ -1,0 +1,44 @@
+document.addEventListener('DOMContentLoaded', function () {
+  var chart = Highcharts.chart({
+    chart: {
+      renderTo: 'all_meals',
+      styledMode: true,
+      type: 'line',
+      zoomType: 'x'
+    },
+    plotOptions: {
+      series: {
+        findNearestPointBy: 'xy',
+        marker: {
+          enabled: true
+        }
+      }
+    },
+    series: [{
+      name: 'Meals served',
+      color: '#00429d',
+      data: [
+<%= @data %>
+      ]
+    }],
+    title: {
+      text: 'All recorded meals'
+    },
+    xAxis: {
+      dateTimeLabelFormats: {
+        day: '%e. %b',
+        week: '%B %e',
+        month: '%B %Y',
+        year: '%Y'
+      },
+      type: 'datetime',
+    },
+    yAxis: {
+      gridLineWidth: 1,
+      min: 0,
+      title: {
+        text: 'Number of plates served'
+      }
+    }
+  });
+});

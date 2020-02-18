@@ -1,0 +1,38 @@
+<% num_styles = 0 %>
+<% colors = ['#00429d', '#3051a7', '#4961b2', '#5f72bc', '#7383c7', '#8695d1', '#99a7dc', '#abb9e6', '#beccf1', '#d0dffb'].cycle %>
+<% strokes = [
+  '5,0',
+  '5,5',
+  '12,5,3,5',
+  '10,10'
+].cycle %>
+
+body {
+    font-family: sans-serif;
+}
+
+nav section {
+    margin: 2em 0;
+}
+
+nav>div:first-child {
+    width: 16em;
+}
+
+nav div {
+    display: inline-block;
+}
+
+nav a {
+    margin-right: 1em;
+    color: blue;
+}
+
+<% (0...num_styles).each do |i| %>
+  <% color = colors.next %>
+  .highcharts-color-<%= i %> {
+      fill:   <%= color %>;
+      stroke: <%= color %>;
+      stroke-dasharray: <%= strokes.next %>;
+  }
+<% end %>

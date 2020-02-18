@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Dashboard (round 3)
+    </title>
+
+    <link rel="stylesheet" href="/round_3/styles.css" />
+  </head>
+
+  <body>
+    <h1>
+      Dashboard (round 3)
+    </h1>
+
+    <nav>
+      <h2>
+        Meal service graphs
+      </h2>
+
+      <section>
+        <div>
+          All meals:
+        </div>
+        <div>
+          <a href="all_meals.html">
+            Link
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          Yearly meals:
+        </div>
+        <div>
+          <a href="yearly_meals.html">
+            Link
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          Monthly meals in the last year:
+        </div>
+        <div>
+          <a href="monthly_meals_in_last_year.html">
+            Link
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          Monthly meals, year over year:
+        </div>
+        <div>
+          <% Date::MONTHNAMES[1..].each do |month| %>
+            <a href="monthly_meals_year_over_year/<%= month %>">
+              <%= month %>
+            </a>
+          <% end %>
+        </div>
+      </section>
+
+      <h2>
+        Christmas prep graphs
+      </h2>
+
+      <section>
+        <div>
+          Stacked bars:
+        </div>
+        <div>
+          <a href="christmas_needs/volunteer">
+            Volunteering
+          </a>
+          <a href="christmas_needs/donate">
+            Donation
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          Sparklines:
+        </div>
+        <div>
+          <a href="christmas_needs/sparklines/volunteer">
+            Volunteering
+          </a>
+          <a href="christmas_needs/sparklines/donate">
+            Donation
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          Gauges:
+        </div>
+        <div>
+          <a href="christmas_needs/gauges/volunteer">
+            Volunteering
+          </a>
+          <a href="christmas_needs/gauges/donate">
+            Donation
+          </a>
+        </div>
+      </section>
+    </nav>
+
+    <script src="/highcharts-8.0.0.js"></script>
+  </body>
+</html>

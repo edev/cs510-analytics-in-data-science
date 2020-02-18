@@ -1,0 +1,33 @@
+$('.chart').each(function(index, elem) {
+  var current = $(elem).data('current');
+  var goal = $(elem).data('goal');
+  var percent = $(elem).data('percent');
+  var title = $(elem).data('title');
+      
+  $(elem).highcharts({
+    chart: {
+      styledMode: true,
+      type: 'solidgauge'
+    },
+    pane: {
+      background: {
+        innerRadius: '60%',
+        outerRadius: '100%',
+        shape: 'arc'
+      },
+      endAngle: 90,
+      startAngle: -90
+    },
+    series: [{
+      name: '2019',
+      data: [current]
+    }],
+    title: {
+      text: title
+    },
+    yAxis: [{
+      min: 0,
+      max: goal
+    }]
+  });
+});

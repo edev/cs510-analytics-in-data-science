@@ -1,0 +1,63 @@
+document.addEventListener('DOMContentLoaded', function () {
+  var chart = Highcharts.chart({
+    chart: {
+      renderTo: 'monthly_meals_year_over_year',
+      styledMode: true,
+      type: 'line'
+    },
+    plotOptions: {
+      series: {
+        findNearestPointBy: 'xy',
+        marker: {
+          enabled: true,
+          radius: 8,
+          symbol: 'circle'
+        },
+        tooltip: {
+          headerFormat: '<span style="font-size: 10px"><%= @month_name %> {point.key}, {series.name}</span><br/>',
+          pointFormat: '<b>{point.y}</b><br />'
+        }
+      }
+    },
+    series: [
+    <% @months.each do |label, strings|
+      entries = strings.join(",\n        ") %>
+    {
+      name: '<%= label %>',
+      data: [
+        <%= entries %>
+      ],
+<% if @month_list[0...-3].include? label %>
+        visible: false
+<% end %>
+    },
+<% end %>
+    ],
+    title: {
+      text: 'Meals served each <%= @month_name %>'
+    },
+    xAxis: {
+      plotLines: [
+        <% color = '#aaa' %>
+        <% (7.5..31).step(7) do |n| %>
+        {
+          color: '<%= color %>',
+          value: <%= n %>
+        },
+      <% end %>
+      ],
+      tickInterval: 1
+    },
+    yAxis: {
+      gridLineColor: '#999',
+      gridLineWidth: 1,
+      min: 0,
+      tickInterval: 100,
+      title: {
+        text: 'Number of plates served'
+      }
+    }
+  });
+});
+
+

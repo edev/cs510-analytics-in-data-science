@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Christmas needs (gauges): <%= @need_type %>
+  </title>
+
+  <link rel="stylesheet" href="https://code.highcharts.com/css/highcharts.css" />
+  <link rel="stylesheet" href="/round_3/styles.css" />
+  </head>
+
+  <body>
+    <% @needs.each do |need_slug, need| %>
+      <div id="<%= need_slug %>"
+           class="chart"
+           data-goal="<%= need[:goal] %>"
+           data-percent="<%= need[:percent] %>"
+           data-current="<%= need[:current] %>"
+           data-title="<%= need_slug.to_s.gsub('_', ' ').capitalize %>">
+      </div>
+    <% end %>
+
+    <script src="/jquery-3.4.1.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+    <script src="/round_3/christmas_needs/gauges/<%= @need_type %>/chart"></script>
+  </body>
+</html>
+
+
