@@ -308,7 +308,7 @@ class Round3 < Sinatra::Base
     needs
   end
 
-  get '/round_3/christmas_needs/gauges/:need_type' do
+  get '/round_3/christmas_needs/primary/:need_type' do
     @need_type = params[:need_type]
     @needs = needs_for(@need_type, (2016..2019).to_a.reverse, 14)
 
@@ -338,13 +338,13 @@ class Round3 < Sinatra::Base
     @gauges = @needs.select { |need_slug, need| GAUGE_NEED_SLUGS.include? need_slug }
     @table_rows = @needs.select { |need_slug, need| TABLE_NEED_SLUGS.include? need_slug }
 
-    erb :'/round_3/christmas_needs_gauges.html'
+    erb :'/round_3/christmas_needs_primary.html'
   end
 
-  get '/round_3/christmas_needs/gauges/:need_type/chart' do
+  get '/round_3/christmas_needs/primary/:need_type/chart' do
     @need_type = params[:need_type]
 
-    erb :'/round_3/christmas_needs_gauges.js', content_type: 'application/javascript'
+    erb :'/round_3/christmas_needs_primary.js', content_type: 'application/javascript'
   end
 
 end
