@@ -12,7 +12,32 @@
   </head>
 
   <body>
-    <% @needs.each do |need_slug, need| %>
+    <table>
+      <thead>
+        <th>
+          Director
+        </th>
+        <th>
+          Filled?
+        </th>
+      </thead>
+      <% @table_rows.each do |need_slug, need| %>
+        <tr>
+          <td>
+            <%= need_slug.to_s.gsub('_', ' ').capitalize %>
+          </td>
+          <td>
+            <% if need[:percent] >= 100 %>
+              <span class="filled">Yes</span>
+            <% else %>
+              <span class="unfilled">No</span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+
+    <% @gauges.each do |need_slug, need| %>
       <div id="<%= need_slug %>"
            class="chart"
            data-goal="<%= need[:goal] %>"
