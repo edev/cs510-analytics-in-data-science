@@ -426,6 +426,32 @@ class Round3 < Sinatra::Base
     @need_type = params[:need_type]
     @needs = needs_for(@need_type, (2016..2019).to_a.reverse, 14)
 
+    GAUGE_NEED_SLUGS = [
+        :choir_singers,
+        :present_wrappers,
+        :final_cleaner_uppers,
+        :gift_buyers,
+        :gym_decarators,
+        :hot_chocolatiers,
+        :line_monitors,
+        :santas_elves,
+        :sign_makers,
+        :snack_server,
+    ]
+
+    TABLE_NEED_SLUGS = [
+        :choir_coordinator,
+        :general_coordinator_for_presents,
+        :photographer,
+        :piano_player_accompanist,
+        :santa,
+        :stocking_manager,
+        :tech_savvy_photo_printers,
+    ]
+
+    @gauges = @needs.select { |need_slug, need| GAUGE_NEED_SLUGS.include? need_slug }
+    @table_rows = @needs.select { |need_slug, need| TABLE_NEED_SLUGS.include? need_slug }
+
     erb :'/round_3/christmas_needs_gauges.html'
   end
 
