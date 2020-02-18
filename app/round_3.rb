@@ -167,108 +167,7 @@ class Round3 < Sinatra::Base
     erb :'round_3/monthly_meals_year_over_year.js', content_type: 'application/javascript'
   end
 
-  get '/round_3/christmas_needs/:need_type' do
-    @need_type = params[:need_type]
-    erb :'round_3/christmas_needs.html'
-  end
-
-  get '/round_3/christmas_needs/:need_type/chart' do
-    # First, compute the dates we'll need to reference.
-    DAYS_BEFORE = 14
-    dinner_this_year = Date.parse(CouchDB::get(CouchDB::uri(CouchDB::token('christmas/2019')))[:dates][:dinner])
-    dinner_last_year = Date.parse(CouchDB::get(CouchDB::uri(CouchDB::token('christmas/2018')))[:dates][:dinner])
-    cutoff_this_year = dinner_this_year - DAYS_BEFORE
-    cutoff_last_year = dinner_last_year - DAYS_BEFORE
-
-    # Retrieve the raw data from the view.
-    key_2018 = CouchDB::token('["2018"]')
-    key_2019 = CouchDB::token('["2019"]')
-    raw_data_this_year = CouchDB::get(CouchDB::uri("_design/round_3/_view/christmas_needs?start_key=#{key_2019}"))
-    raw_data_last_year =
-      CouchDB::get(CouchDB::uri("_design/round_3/_view/christmas_needs?start_key=#{key_2018}&end_key=#{key_2019}"))
-
-    # Process this year's data for each need, collecting results into the needs Hash and building the category list.
-    needs = Hash.new
-    @categories = []
-    raw_data_this_year[:rows]&.each do |row|
-      need_slug = row[:key][1].to_sym
-      goal = row[:value][:goal]
-
-      # Note: we could optimize this by moving page to the key, then sorting & filtering accordingly.
-      page = row[:value][:page]
-      next unless page == params[:need_type]
-
-      # Note: in CouchDB, adjustments should be an array of objects but is just a single object.
-      adjustment = row[:value][:adjustment].to_i
-
-      this_year_so_far =  # Note: we only need to filter these for the demo; the live product will show live totals.
-        row[:value][:sign_ups]
-        .select { |hash| Date.parse(hash[:created_at]) < cutoff_this_year }   # Filter by cutoff.
-        .map { |hash| hash[:quantity] }   # Keep only quantity.
-        .reduce(0, :+)
-      this_year_so_far += adjustment
-
-      needs[need_slug] = {
-        this_year: (this_year_so_far.to_f / goal * 100).to_i
-      }
-
-      # Note: we do NOT want to use the title of each need, because it might contain distracting information
-      # like "on 12/14 and 12/17". Better to transform the need slug.
-      @categories << need_slug.to_s.gsub('_', ' ').capitalize
-    end
-
-    # Process last year's data, collecting results into the needs Hash.
-    raw_data_last_year[:rows]&.each do |row|
-      need_slug = row[:key][1].to_sym
-      goal = row[:value][:goal]
-
-      # Note: in CouchDB, adjustments should be an array of objects but is just a single object.
-      adjustment = row[:value][:adjustment].to_i
-
-      last_year_so_far =  # Note: we still still need to filter last year's result in production.
-        row[:value][:sign_ups]
-        .select { |hash| Date.parse(hash[:created_at]) < cutoff_last_year }   # Filter by cutoff.
-        .map { |hash| hash[:quantity] }   # Keep only quantity.
-        .reduce(0, :+)
-      last_year_so_far += adjustment
-
-      last_year_total =
-        row[:value][:sign_ups]
-        .reject { |hash| Date.parse(hash[:created_at]) < cutoff_last_year }   # Keep only after cutoff.
-        .map { |hash| hash[:quantity] }   # Keep only quantity.
-        .reduce(0, :+)
-      last_year_total
-
-      if needs.has_key? need_slug
-        needs[need_slug][:last_year] = (last_year_so_far.to_f / goal * 100).to_i
-        needs[need_slug][:last_year_total] = (last_year_total.to_f / goal * 100).to_i
-      end   # No else clause, because if it doesn't exist this year, then we don't even want to show it.
-    end
-
-    # At this point, needs has one key for each need_slug in this year's data set. Each value is a Hash.
-    # Each value hash has a key :this_year holding this year's total of sign-ups so far.
-    # Each value hash might or might not have two additional keys:
-    #   :last_year holds the total for last year by the same number of days before the event.
-    #   :last_year_total holds the total for last year overall.
-    #
-    # Now, we need to scan through these three keys, pulling the values into one of three matching arrays.
-    # The reason we held these in a Hash is to guarantee that we will iterate over them in the same order,
-    # even in the presence of missing or new need_slugs or other anomalies.
-    #
-    # Note: adding || 0 to the end of each map transforms nils (due to missing keys) into 0 values that JS will accept.
-
-    @data_this_year = needs.map { |need_slug, hash| hash[:this_year] || 0 }
-    @data_last_year = needs.map { |need_slug, hash| hash[:last_year] || 0 }
-    @data_last_year_total = needs.map { |need_slug, hash| hash[:last_year_total] || 0 }
-
-    erb :'/round_3/christmas_needs.js', content_type: 'application/javascript'
-  end
-
   get '/round_3/christmas_needs.css' do
-    key_2019 = CouchDB::token('["2019"]')
-    raw_data_this_year = CouchDB::get(CouchDB::uri("_design/round_3/_view/christmas_needs?start_key=#{key_2019}"))
-    @need_count = raw_data_this_year[:rows]&.length
-
     erb :'/round_3/christmas_needs.css', content_type: 'text/css'
   end
 
@@ -407,19 +306,6 @@ class Round3 < Sinatra::Base
       end
     end
     needs
-  end
-
-  get '/round_3/christmas_needs/sparklines/:need_type' do
-    @need_type = params[:need_type]
-    @needs = needs_for(@need_type, (2016..2019).to_a.reverse, 14)
-
-    erb :'/round_3/christmas_needs_sparklines.html'
-  end
-
-  get '/round_3/christmas_needs/sparklines/:need_type/chart' do
-    @need_type = params[:need_type]
-
-    erb :'/round_3/christmas_needs_sparklines.js', content_type: 'application/javascript'
   end
 
   get '/round_3/christmas_needs/gauges/:need_type' do
