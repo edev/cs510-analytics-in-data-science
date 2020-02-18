@@ -13,7 +13,7 @@
   </head>
 
   <body>
-    <table>
+    <table id="directors">
       <tr>
         <th>
           Director
@@ -38,20 +38,22 @@
       <% end %>
     </table>
 
-    <% @gauges.each do |need_slug, need| %>
-      <div id="<%= need_slug %>"
-           class="chart"
-           data-goal="<%= need[:goal] %>"
-           data-percent="<%= need[:percent] %>"
-           data-current="<%= need[:current] %>"
-           data-title="<%= need_slug.to_s.gsub('_', ' ').capitalize %>">
-      </div>
-    <% end %>
+    <div id="gauges">
+      <% @gauges.each do |need_slug, need| %>
+        <figure id="<%= need_slug %>"
+             class="chart"
+             data-goal="<%= need[:goal] %>"
+             data-percent="<%= need[:percent] %>"
+             data-current="<%= need[:current] %>"
+             data-title="<%= need_slug.to_s.gsub('_', ' ').capitalize %>">
+        </figure>
+      <% end %>
+    </div>
 
     <script src="/jquery-3.4.1.js"></script>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/highcharts-more.js"></script>
-    <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+    <script src="/highcharts-8.0.0.js"></script>
+    <script src="/highcharts-more-8.0.0.js"></script>
+    <script src="/highcharts-solid-gauge-8.0.0.js"></script>
     <script src="/round_3/christmas_needs/primary/<%= @need_type %>/chart"></script>
   </body>
 </html>

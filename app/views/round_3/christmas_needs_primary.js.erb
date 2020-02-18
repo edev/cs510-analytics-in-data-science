@@ -9,6 +9,9 @@ $('.chart').each(function(index, elem) {
       styledMode: true,
       type: 'solidgauge'
     },
+    credits: {
+      enabled: false
+    },
     pane: {
       background: {
         innerRadius: '60%',
@@ -16,18 +19,38 @@ $('.chart').each(function(index, elem) {
         shape: 'arc'
       },
       endAngle: 90,
+      size: '100%',
       startAngle: -90
     },
     series: [{
       name: '2019',
-      data: [current]
+      data: [{
+        y: current,
+        name: 'Progress'
+      }, {
+        y: goal,
+        name: 'Goal',
+        innerRadius: 0,
+        radius: 0
+      }],
+      dataLabels: {
+        formatter: function (self) {
+          return current.toString() + ' / ' + goal.toString();
+        },
+      }
     }],
     title: {
-      text: title
+      text: title,
+      useHTML: true,
+      widthAdjust: 0
     },
     yAxis: [{
+      labels: {
+        enabled: false
+      },
       min: 0,
-      max: goal
+      max: goal,
+      tickAmount: 2,
     }]
   });
 });
