@@ -309,7 +309,9 @@ class Round3 < Sinatra::Base
   end
 
   get '/round_3/christmas_needs' do
-    @volunteer_needs = needs_for('volunteer', (2016..2019).to_a.reverse, 14)
+    YEARS = (2016..2019).to_a.reverse
+    CUTOFF = 14
+    @volunteer_needs = needs_for('volunteer', YEARS, CUTOFF)
 
     GAUGE_NEED_SLUGS = [
         :choir_singers,
@@ -335,7 +337,10 @@ class Round3 < Sinatra::Base
     ]
 
     @primary_gauges = @volunteer_needs.select { |need_slug, need| GAUGE_NEED_SLUGS.include? need_slug }
-    @minor_gauges = @volunteer_needs.reject { |need_slug, need| GAUGE_NEED_SLUGS.include? need_slug }
+    @donation_gauges = needs_for('donate', YEARS, CUTOFF)
+    @minor_gauges = @volunteer_needs.reject do |need_slug, need|
+      GAUGE_NEED_SLUGS.include?(need_slug) || TABLE_NEED_SLUGS.include?(need_slug)
+    end
     @table_rows = @volunteer_needs.select { |need_slug, need| TABLE_NEED_SLUGS.include? need_slug }
 
     erb :'/round_3/christmas_needs_primary.html'

@@ -13,36 +13,57 @@
   </head>
 
   <body>
-    <table id="directors">
-      <tr>
-        <th>
-          Director
-        </th>
-        <th>
-          Filled?
-        </th>
-      </tr>
-
-      <% @table_rows.each do |need_slug, need| %>
+    <div id="directors">
+      <h2>
+        Directors
+      </h2>
+      <table>
         <tr>
-          <td>
-            <%= need_slug.to_s.gsub('_', ' ').capitalize %>
-          </td>
-          <td>
-            <% if need[:percent] >= 100 %>
-              <span class="filled">Yes</span>
-            <% else %>
-              <span class="unfilled">No</span>
-            <% end %>
-          </td>
+          <th>
+            Position
+          </th>
+          <th>
+            Filled?
+          </th>
         </tr>
-      <% end %>
-    </table>
+
+        <% @table_rows.each do |need_slug, need| %>
+          <tr>
+            <td>
+              <%= need_slug.to_s.gsub('_', ' ').capitalize %>
+            </td>
+            <td>
+              <% if need[:percent] >= 100 %>
+                <span class="filled">Yes</span>
+              <% else %>
+                <span class="unfilled">No</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+
     <div class="gauges">
       <h2>
         Primary volunteer needs
       </h2>
       <% @primary_gauges.each do |need_slug, need| %>
+        <figure id="<%= need_slug %>"
+             class="chart"
+             data-goal="<%= need[:goal] %>"
+             data-percent="<%= need[:percent] %>"
+             data-current="<%= need[:current] %>"
+             data-title="<%= need_slug.to_s.gsub('_', ' ').capitalize %>">
+        </figure>
+      <% end %>
+    </div>
+
+    <div class="gauges">
+      <h2>
+        Donation needs
+      </h2>
+      <% @donation_gauges.each do |need_slug, need| %>
         <figure id="<%= need_slug %>"
              class="chart"
              data-goal="<%= need[:goal] %>"
