@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>
-      Christmas needs (gauges): <%= @need_type %>
+      Christmas Dashboard
   </title>
 
   <link rel="stylesheet" href="https://code.highcharts.com/css/highcharts.css" />
@@ -22,6 +22,7 @@
           Filled?
         </th>
       </tr>
+
       <% @table_rows.each do |need_slug, need| %>
         <tr>
           <td>
@@ -37,9 +38,26 @@
         </tr>
       <% end %>
     </table>
+    <div class="gauges">
+      <h2>
+        Primary volunteer needs
+      </h2>
+      <% @primary_gauges.each do |need_slug, need| %>
+        <figure id="<%= need_slug %>"
+             class="chart"
+             data-goal="<%= need[:goal] %>"
+             data-percent="<%= need[:percent] %>"
+             data-current="<%= need[:current] %>"
+             data-title="<%= need_slug.to_s.gsub('_', ' ').capitalize %>">
+        </figure>
+      <% end %>
+    </div>
 
-    <div id="gauges">
-      <% @gauges.each do |need_slug, need| %>
+    <div class="gauges">
+      <h2>
+        Minor volunteer needs
+      </h2>
+      <% @minor_gauges.each do |need_slug, need| %>
         <figure id="<%= need_slug %>"
              class="chart"
              data-goal="<%= need[:goal] %>"
@@ -54,7 +72,7 @@
     <script src="/highcharts-8.0.0.js"></script>
     <script src="/highcharts-more-8.0.0.js"></script>
     <script src="/highcharts-solid-gauge-8.0.0.js"></script>
-    <script src="/round_3/christmas_needs/primary/<%= @need_type %>/chart"></script>
+    <script src="/round_3/christmas_needs/chart"></script>
   </body>
 </html>
 
