@@ -368,6 +368,66 @@ class Round3 < Sinatra::Base
       CouchDB::get(
         CouchDB::uri("_design/round_3/_view/christmas_need_timelines?#{options}"))
 
+    # records has the format:
+    # {
+    #   :rows => [
+    #     {
+    #       :key => ['some_need_slug', 'yyyy', 'mm', 'dd'],
+    #       :values => n
+    #     }, ...
+    #   ]
+    # }
+    #
+    # with one row for each date on which we had at least one sign-up.
+    #
+    # The query handles any days with multiple sign-ups, so we don't have to worry about that below.
+
+    # Now that we have all the entries ever, we need to transform them so we can pass them as series to Highcharts.
+    # We need to group them by year, with each year becoming a series in Highcharts.
+    # We also need to transform each date into a number of days before the event. While we could do this in CouchDB,
+    # doing it here lets the view be more general and thus more reusable.
+
+    @series = {}
+    event_date_cache = {}
+    records[:rows]&.each do |row|
+      # Parse the date part of the key.
+      date = row[:key][1..3]              # Pull out the date. For safety, explicitly get elements 1 through 3.
+      date = date.map { |s| Integer(s) }  # Parse strings to ints, failing if any fail (which they shouldn't).
+      date = Date.new *date               # Construct a Date object.
+
+      # If we don't have a date in our event_date_cache, retrieve it.
+      unless event_date_cache.has_key? date.year
+        event_date_cache[date.year] = Date.parse(
+          CouchDB::get(
+            CouchDB::uri(
+              CouchDB::token(
+                "christmas/#{date.year}"
+              )
+            )
+          )[:dates][:dinner]
+        )
+      end
+
+      days_before = (date - event_date_cache[date.year]).to_i
+      unless @series.has_key? date.year
+        @series[date.year] = {}
+      end
+      @series[date.year][days_before] = row[:value]
+    end
+
+    # @series now has the following format:
+    #
+    # {
+    #   2017 => {
+    #     -40 => 6,
+    #     -32 => 9,
+    #     ...
+    #   } ,
+    #   ...
+    # }
+    #
+    # where a row like -40 => 6 means that 40 days before the event in 2017, there were a total of 6 sign-ups.
+
     records.inspect
   end
 
