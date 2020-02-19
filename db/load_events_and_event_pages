@@ -76,7 +76,7 @@ end
 
 db = SQLite3::Database.new ARGV[0]
 
-sql_events = db.execute("SELECT * FROM events WHERE name LIKE '%201%'")
+sql_events = db.execute("SELECT * FROM events WHERE name NOT LIKE 'Short%'")  # Exclude short-term volunteer requests.
 sql_events.each do |event|
     # event is an array with the following items at the given indexes:
     # 0: SQL record ID
