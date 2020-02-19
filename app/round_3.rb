@@ -352,4 +352,23 @@ class Round3 < Sinatra::Base
     erb :'/round_3/christmas_needs_primary.js', content_type: 'application/javascript'
   end
 
+  get '/round_3/christmas_needs/timeline/:need_slug' do
+    @need_slug = params[:need_slug]
+
+    start_key = CouchDB::token %{["#{@need_slug}"]}
+    end_key = CouchDB::token %{["#{@need_slug}/{}"]}
+
+    options = [
+      "start_key=#{start_key}",
+      "end_key=#{end_key}",
+      "group=true"
+    ].join("&")
+
+    records =
+      CouchDB::get(
+        CouchDB::uri("_design/round_3/_view/christmas_need_timelines?#{options}"))
+
+    records.inspect
+  end
+
 end
