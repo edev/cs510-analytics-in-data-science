@@ -1,0 +1,26 @@
+Highcharts.chart({
+  chart: {
+    renderTo: 'timeline',
+    styledMode: true,
+    type: 'line'
+  },
+  plotOptions: {
+    line: {
+      step: 'left'
+    }
+  },
+  series: [
+    <% @series.each do |year, points| %>
+    {
+      name: '<%= year %>',
+      data: [[-90, 0], <%= points.map {|x, y| "[#{x}, #{y}]"}.join(", ") %>, [0, <%= points.values.last %>]]
+    },
+    <% end %>
+  ],
+  title: {
+    text: 'Timeline of sign-ups for: <%= @need_slug.gsub('_', ' ') %>',
+  },
+  yAxis: [{
+  }]
+});
+

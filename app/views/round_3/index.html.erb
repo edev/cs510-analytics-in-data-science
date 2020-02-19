@@ -80,6 +80,32 @@
           </a>
         </div>
       </section>
+
+      <section>
+        <div>
+          Volunteer sign-up timelines:
+        </div>
+        <% GAUGE_NEED_SLUGS.each do |need_slug| %>
+          <div>
+            <a href="christmas_needs/timeline/<%= need_slug %>">
+              <%= need_slug.to_s.gsub('_', ' ').capitalize %>
+            </a>
+          </div>
+        <% end %>
+      </section>
+
+      <section>
+        <div>
+          Donation sign-up timelines:
+        </div>
+        <% DONATION_NEED_SLUGS.each do |need_slug| %>
+          <div>
+            <a href="christmas_needs/timeline/<%= need_slug %>">
+              <%= need_slug.to_s.gsub('_', ' ').capitalize %>
+            </a>
+          </div>
+        <% end %>
+      </section>
     </nav>
 
     <script src="/highcharts-8.0.0.js"></script>

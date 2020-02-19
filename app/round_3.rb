@@ -2,6 +2,39 @@ require 'sinatra/base'
 
 class Round3 < Sinatra::Base
 
+  GAUGE_NEED_SLUGS = [
+    :choir_singers,
+    :present_wrappers,
+    :final_cleaner_uppers,
+    :gift_buyers,
+    :gym_decorators,
+    :hot_chocolatiers,
+    :line_monitors,
+    :santas_elves,
+    :sign_makers,
+    :snack_server,
+  ]
+
+  TABLE_NEED_SLUGS = [
+    :choir_coordinator,
+    :general_coordinator_for_presents,
+    :photographer,
+    :piano_player_accompanist,
+    :santa,
+    :stocking_manager,
+    :tech_savvy_photo_printers,
+  ]
+
+  DONATION_NEED_SLUGS = [
+    :candy_canes,
+    :gifts_and_toys,
+    :individually_wrapped_candy,
+    :knitted_scarves_andor_hats,
+    :toothbrushes,
+    :toothpaste,
+    :white_sport_socks
+  ]
+
   get '/round_3/' do
     erb :'round_3/index.html'
   end
@@ -313,29 +346,6 @@ class Round3 < Sinatra::Base
     CUTOFF = 14
     @volunteer_needs = needs_for('volunteer', YEARS, CUTOFF)
 
-    GAUGE_NEED_SLUGS = [
-        :choir_singers,
-        :present_wrappers,
-        :final_cleaner_uppers,
-        :gift_buyers,
-        :gym_decarators,
-        :hot_chocolatiers,
-        :line_monitors,
-        :santas_elves,
-        :sign_makers,
-        :snack_server,
-    ]
-
-    TABLE_NEED_SLUGS = [
-        :choir_coordinator,
-        :general_coordinator_for_presents,
-        :photographer,
-        :piano_player_accompanist,
-        :santa,
-        :stocking_manager,
-        :tech_savvy_photo_printers,
-    ]
-
     @primary_gauges = @volunteer_needs.select { |need_slug, need| GAUGE_NEED_SLUGS.include? need_slug }
     @donation_gauges = needs_for('donate', YEARS, CUTOFF)
     @minor_gauges = @volunteer_needs.reject do |need_slug, need|
@@ -353,6 +363,12 @@ class Round3 < Sinatra::Base
   end
 
   get '/round_3/christmas_needs/timeline/:need_slug' do
+    @need_slug = params[:need_slug]
+
+    erb :'/round_3/christmas_need_timeline.html'
+  end
+
+  get '/round_3/christmas_needs/timeline/:need_slug/chart' do
     @need_slug = params[:need_slug]
 
     start_key = CouchDB::token %{["#{@need_slug}"]}
@@ -392,7 +408,7 @@ class Round3 < Sinatra::Base
     records[:rows]&.each do |row|
       # Parse the date part of the key.
       date = row[:key][1..3]              # Pull out the date. For safety, explicitly get elements 1 through 3.
-      date = date.map { |s| Integer(s) }  # Parse strings to ints, failing if any fail (which they shouldn't).
+      date = date.map { |s| Integer(s, 10) }  # Parse strings to ints, failing if any fail (which they shouldn't).
       date = Date.new *date               # Construct a Date object.
 
       # If we don't have a date in our event_date_cache, retrieve it.
@@ -428,7 +444,7 @@ class Round3 < Sinatra::Base
     #
     # where a row like -40 => 6 means that 40 days before the event in 2017, there were a total of 6 sign-ups.
 
-    records.inspect
+    erb :'/round_3/christmas_need_timeline.js', content_type: 'application/javascript'
   end
 
 end
