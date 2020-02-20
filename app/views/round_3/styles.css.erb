@@ -11,23 +11,6 @@ body {
     font-family: sans-serif;
 }
 
-nav section {
-    margin: 2em 0;
-}
-
-nav>div:first-child {
-    width: 16em;
-}
-
-nav div {
-    display: inline-block;
-}
-
-nav a {
-    margin-right: 1em;
-    color: blue;
-}
-
 <% (0...num_styles).each do |i| %>
   <% color = colors.next %>
   .highcharts-color-<%= i %> {

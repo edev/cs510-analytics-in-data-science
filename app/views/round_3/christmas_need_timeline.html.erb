@@ -10,36 +10,37 @@
   <link rel="stylesheet" href="https://code.highcharts.com/css/highcharts.css" />
   <link rel="stylesheet" href="/round_3/styles.css" />
   <link rel="stylesheet" href="/round_3/christmas_needs.css" />
+  <link rel="stylesheet" href="/round_3/christmas_need_timeline.css" />
   </head>
 
   <body>
     <% unless @need_group.nil? %>
       <nav>
-      <% unless @previous_need_slug.nil? %>
-        <div id="prev">
-          <a href="/round_3/christmas_needs/timeline/<%= @previous_need_slug %>">
-            Previous<br />
-            <%= @previous_need_slug.gsub('_', ' ').capitalize %>
-          </a>
-        </div>
-      <% end %>
 
-      <select id="dropdown-nav">
-        <% @need_group.each do |need_slug| %>
-          <option value="<%= need_slug.to_s %>" <%= 'selected' if need_slug.to_s == @need_slug %>>
-            <%= need_slug.to_s.gsub('_', ' ').capitalize %>
-          </option>
+        <% unless @previous_need_slug.nil? %>
+          <div id="prev">
+            <a href="/round_3/christmas_needs/timeline/<%= @previous_need_slug %>">
+              ← Previous (<%= @previous_need_slug.gsub('_', ' ').capitalize %>)
+            </a>
+          </div>
         <% end %>
-      </select>
 
-      <% unless @next_need_slug.nil? %>
-        <div id="prev">
-          <a href="/round_3/christmas_needs/timeline/<%= @next_need_slug %>">
-            Next<br />
-            <%= @next_need_slug.gsub('_', ' ').capitalize %>
-          </a>
-        </div>
-      <% end %>
+        <% unless @next_need_slug.nil? %>
+          <div id="next">
+            <a href="/round_3/christmas_needs/timeline/<%= @next_need_slug %>">
+              Next (<%= @next_need_slug.gsub('_', ' ').capitalize %>) →
+            </a>
+          </div>
+        <% end %>
+
+        <select id="dropdown-nav">
+          <% @need_group.each do |need_slug| %>
+            <option value="<%= need_slug.to_s %>" <%= 'selected' if need_slug.to_s == @need_slug %>>
+              <%= need_slug.to_s.gsub('_', ' ').capitalize %>
+            </option>
+          <% end %>
+        </select>
+
       </nav>
     <% end %>
 

@@ -479,4 +479,8 @@ class Round3 < Sinatra::Base
   get '/round_3/christmas_needs/timeline/:need_slug/navigation' do
     erb :'/round_3/christmas_need_timeline_dropdown_nav.js', content_type: 'application/javascript'
   end
+
+  get '/round_3/landing.css' do
+    erb :'/round_3/landing.css'
+  end
 end
