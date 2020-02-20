@@ -365,6 +365,35 @@ class Round3 < Sinatra::Base
   get '/round_3/christmas_needs/timeline/:need_slug' do
     @need_slug = params[:need_slug]
 
+    @need_group = 
+      if GAUGE_NEED_SLUGS.include? @need_slug.to_sym
+        GAUGE_NEED_SLUGS
+      elsif TABLE_NEED_SLUGS.include? @need_slug.to_sym
+        TABLE_NEED_SLUGS
+      elsif DONATION_NEED_SLUGS.include? @need_slug.to_sym
+        DONATION_NEED_SLUGS
+      else
+        # We don't have a list for this category, but they aren't important for the demo anyway. We can add them later
+        # if need be; the final design in production should presumably have them in a group.
+        nil
+      end
+
+    unless @need_group.nil?
+      need_slug_index = @need_group.index(@need_slug.to_sym)
+      @previous_need_slug =
+        if need_slug_index > 0
+          @need_group[need_slug_index-1].to_s
+        else
+          nil
+        end
+      @next_need_slug =
+        if need_slug_index < @need_group.length - 1
+          @need_group[need_slug_index+1].to_s
+        else
+          nil
+        end
+    end
+      
     erb :'/round_3/christmas_need_timeline.html'
   end
 
@@ -447,4 +476,7 @@ class Round3 < Sinatra::Base
     erb :'/round_3/christmas_need_timeline.js', content_type: 'application/javascript'
   end
 
+  get '/round_3/christmas_needs/timeline/:need_slug/navigation' do
+    erb :'/round_3/christmas_need_timeline_dropdown_nav.js', content_type: 'application/javascript'
+  end
 end
