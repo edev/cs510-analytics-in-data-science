@@ -1,4 +1,5 @@
 $('.chart').each(function(index, elem) {
+  var id = $(elem).attr('id');
   var current = $(elem).data('current');
   var goal = $(elem).data('goal');
   var percent = $(elem).data('percent');
@@ -39,6 +40,10 @@ $('.chart').each(function(index, elem) {
         },
       }
     }],
+    subtitle: {
+      text: '<a href="/round_3/christmas_needs/timeline/' + id + '">Timeline</a>',
+      useHTML: true
+    },
     title: {
       text: title,
       useHTML: true,
