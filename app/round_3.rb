@@ -481,6 +481,6 @@ class Round3 < Sinatra::Base
   end
 
   get '/round_3/landing.css' do
-    erb :'/round_3/landing.css'
+    erb :'/round_3/landing.css', content_type: 'text/css'
   end
 end
