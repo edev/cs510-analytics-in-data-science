@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', function () {
       text: 'Meals served by month in the last year'
     },
     xAxis: {
+      min: 1,
+      max: 31,
       plotLines: [
         <% color = '#aaa' %>
         <% (7.5..31).step(7) do |n| %>
