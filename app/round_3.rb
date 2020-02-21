@@ -473,6 +473,8 @@ class Round3 < Sinatra::Base
     #
     # where a row like -40 => 6 means that 40 days before the event in 2017, there were a total of 6 sign-ups.
 
+    @goal = CouchDB::get(CouchDB::uri(CouchDB::token("needs/#{@need_slug}/2019")))[:goal]
+
     erb :'/round_3/christmas_need_timeline.js', content_type: 'application/javascript'
   end
 

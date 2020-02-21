@@ -1,0 +1,10 @@
+.highcharts-xaxis-grid .highcharts-grid-line {
+    stroke-width: 1px;
+    stroke: black;
+}
+
+.highcharts-plot-line {
+    stroke: #aaa;
+    stroke-dasharray: 8, 6, 2, 6;
+}
+

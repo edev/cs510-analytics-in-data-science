@@ -72,7 +72,7 @@ def sign_ups(need_id)
             phone: row[2],
             quantity: row[3],
             comment: row[4],
-            created_at: row[5]
+            created_at: (DateTime.parse(row[5]) - (8/24.0)).strftime('%F %T.%6N')
         }
     end
 

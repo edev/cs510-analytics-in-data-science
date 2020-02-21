@@ -22,3 +22,21 @@ nav {
     text-align: center;
 }
 
+.highcharts-xaxis-grid .highcharts-grid-line {
+    stroke-width: 1px;
+    stroke: black;
+}
+
+.highcharts-graph {
+    stroke-width: 3px;
+}
+
+.highcharts-plot-line {
+    stroke-width: 2px;
+    stroke: #555;
+    stroke-dasharray: 24, 24
+}
+
+.highcharts-container {
+    font-size: 14pt;
+}

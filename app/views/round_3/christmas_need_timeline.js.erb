@@ -6,7 +6,13 @@ Highcharts.chart({
   },
   plotOptions: {
     line: {
-      step: 'left'
+      marker: {
+        enabled: false
+      },
+      step: 'left',
+      tooltip: {
+        headerFormat: '<b>T{point.key} days to Christmas dinner</b><br />'
+      }
     }
   },
   series: [
@@ -20,7 +26,22 @@ Highcharts.chart({
   title: {
     text: 'Timeline of sign-ups for: <%= @need_slug.gsub('_', ' ') %>',
   },
+  xAxis: [{
+    gridLineWidth: 1,
+    minorTickInterval: 1,
+    tickInterval: 7
+  }],
   yAxis: [{
+    min: 0,
+    minRange: <%= @goal %> * 1.1,
+    plotLines: [{
+      label: {
+        text: 'Goal: <%= @goal %>',
+        useHTML: true
+      },
+      value: <%= @goal %>,
+      zIndex: 2
+    }]
   }]
 });
 
