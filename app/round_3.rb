@@ -4,12 +4,12 @@ class Round3 < Sinatra::Base
 
   GAUGE_NEED_SLUGS = [
     :choir_singers,
-    :present_wrappers,
     :final_cleaner_uppers,
     :gift_buyers,
     :gym_decorators,
     :hot_chocolatiers,
     :line_monitors,
+    :present_wrappers,
     :santas_elves,
     :sign_makers,
     :snack_server,
