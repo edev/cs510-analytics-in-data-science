@@ -158,7 +158,7 @@ class Round3 < Sinatra::Base
   get '/round_3/monthly_meals_year_over_year/:month/chart' do
     month_number = params[:month].to_i
     if month_number < 1 || month_number > 12
-      redirect '/round_1/index.html'
+      redirect '/round_3/index.html'
     end
 
     @month_name = Date::MONTHNAMES[month_number]
