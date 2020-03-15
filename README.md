@@ -5,6 +5,12 @@ CS 510 - Analytics in Data Science \
 Portland State University \
 Winter 2020
 
+## Topic Presentation
+[Team Chart Soup: Highcharts](https://docs.google.com/presentation/d/1hJvzwQmKQuZsPRQFHktMBUiOxOcbYfImwsQ59ONI94k/edit?usp=sharing)
+
+## Final Presentation
+[Team Chart Soup: Soup Kitchen Dashboard](https://docs.google.com/presentation/d/1SaYmehMIz1HZ7VKM-gyl8wvXZ2sYYBFioFBFjIK2FdE/edit?usp=sharing)
+
 ## Project Goal
 
 I will develop a set of roughly 3-5 data visualizations over the Bounty data set using Highcharts.
@@ -22,3 +28,9 @@ As I am working solo, I will perform all work for this project.
 ## Task List
 
 For those with permission (e.g. Kristin and Hisham), the prescribed task list is available [here](https://docs.google.com/spreadsheets/d/1CUl_LhUJIpeTCCYUsAmj-yaHKzr6QwEefVFgDASnyNk/).
+
+## Permission to Use
+
+Kristin Tufte has full permission to use all materials associated with this project, including but not limited to future classes, and may share these materials and grant these same permissions to others.
+
+Please note that the data set is not included in this repository and will not be shared.
